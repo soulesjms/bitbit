@@ -1,0 +1,4 @@
+bitbit
+======
+
+Bitmap animation utility
