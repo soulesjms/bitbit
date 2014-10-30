@@ -3,17 +3,13 @@
  */
 package scripturejournalapp;
 
-import java.awt.Desktop;
 import java.io.File;
-import java.io.IOException;
-import static java.lang.System.exit;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
-import static javafx.application.Platform.exit;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,7 +26,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCombination;
@@ -47,7 +42,9 @@ public class ScriptureJournalApp extends Application {
 
     String journalTxt;
     String outputXml;
-    String outputTxt;
+    static String outputTxt;
+    //Default input file, xml or txt
+    static String inFile;
 
     private Journal j;
     private TextArea entryField;
@@ -58,23 +55,16 @@ public class ScriptureJournalApp extends Application {
      */
     public static void main(String[] args) {
         ScriptureJournalApp sja = new ScriptureJournalApp();
-        if (args.length < 3) {
-            System.out.println("In parameters you may specify: Input text, Output xml , Output text files");
-        } else {
-            sja.setJournalTxt(args[0]);
-            sja.setOutputXml(args[1]);
-            sja.setOutputTxt(args[2]);
-            try {
-                FileServices mS4 = new FileServices();
-                System.out.println("Importing journal file: " + sja.getJournalTxt());
-                Journal j = mS4.txtToJournal(sja.getJournalTxt());
-                System.out.println("Exporting xml document: " + sja.getOutputXml());
-                mS4.saveDocument(mS4.buildXmlDocument(j), sja.getOutputXml());
-                System.out.println("Exporting txt document: " + sja.getOutputTxt());
-                mS4.saveTxt(j, sja.getOutputTxt());
-            } catch (Exception ex) {
-                Logger.getLogger(FileServices.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        if (args.length < 1) {
+            System.out.println("Error: only " + args.length
+                    + "PLEASE PASS IN FILE TO LOAD, defaults will be loaded this time...");
+            inFile = "/home/adam/Desktop/yay.xml";
+            //inFile = "/home/adam/Downloads/journ.txt";
+        } else if (args.length == 1) {
+            inFile = args[0];
+        }
+        else {
+            System.err.println("So many parameters not supported, try again with one input file");
         }
         //Launch javafx GUI!
         launch(args);
@@ -138,8 +128,17 @@ public class ScriptureJournalApp extends Application {
         entryField.setWrapText(true);
         entryField.setTooltip(new Tooltip("Context of Entry"));
 
-        //j = loadTxt("/home/adam/Downloads/journ.txt");
-        j = loadXml("/home/adam/Desktop/yay.xml");
+        
+            if (inFile.contains(".txt")) {
+                j = loadTxt(inFile);          
+            } else if (inFile.contains(".xml")) {
+               j = loadXml(inFile);
+            }
+            else {
+                System.err.println(inFile + " is not a valid file to load");
+            }
+        
+        
         for (Entry eCurr : j.getEntries()) {
             entriesOList.add(eCurr);
         }
