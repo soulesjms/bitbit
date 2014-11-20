@@ -15,7 +15,7 @@ import javax.imageio.ImageIO;
 
 /**
  *
- * @author adam
+ * @author adam and mark
  */
 public class BitBit {
 
