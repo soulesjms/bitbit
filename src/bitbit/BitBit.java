@@ -20,8 +20,8 @@ import javax.imageio.ImageIO;
 public class BitBit {
 
     //TODO: switch to be in object
-    static int width = 0;
-    static int height = 0;
+    static int width;
+    static int height;
 
     /**
      * @param args the command line arguments
@@ -70,10 +70,10 @@ public class BitBit {
                 int color = image.getRGB(xPixel, yPixel);
                 {
                    System.out.print("Adding color: " + intToHex(color));
-                    System.out.println(ANSI_RED + "  R=" + ANSI_RESET + hexToInt(intToHex(color).substring(2, 4))
-                                      + ANSI_GREEN + " G=" + ANSI_RESET + hexToInt(intToHex(color).substring(4, 6))
-                                      + ANSI_BLUE + " B=" + ANSI_RESET + hexToInt(intToHex(color).substring(6, 8))
-                               + " Special: " + hexToInt(intToHex(color).substring(0, 2))
+                    System.out.println("  R=" + intToHex(color).substring(2, 4)
+                                      + " G=" + intToHex(color).substring(4, 6)
+                                      + " B=" + intToHex(color).substring(6, 8)
+                               + " Special: " + intToHex(color).substring(0, 2)
                             + " to 2d array, X=" + xPixel + " Y=" + yPixel);
                     array2D[xPixel][yPixel] = color;
                 }
@@ -81,8 +81,7 @@ public class BitBit {
         }
         return array2D;
     }
-   
-    //console display
+
     public static void displayArray2D(int[][] color, int xMax, int yMax) {
         System.out.println("Width:" + width + ", Height:"
                 + height);
@@ -162,11 +161,11 @@ public class BitBit {
     public static String getInkColor(int r, int g, int b, int s) {
         if (b < 50 && r < 50 && g < 50) {
             System.out.print(ANSI_BLACK + "[" + "b" + "");
-        } else if (b < 80 && r > 150 && g < 80) {
+        } else if (b < 50 && r > 50 && g < 50) {
             System.out.print(ANSI_RED + "[" + "R" + "");
         } else if (b < 150 && r < 100 && g > 50) {
             System.out.print(ANSI_GREEN + "[" + "G" + "");
-        } else if (b > 150 && r < 80 && g < 80) {
+        } else if (b > 50 && r < 50 && g < 50) {
             System.out.print(ANSI_BLUE + "[" + "B" + "");
         } else if (b > 50 && r > 50 && g < 70) {
             System.out.print(ANSI_PURPLE + "[" + "P" + "");
@@ -181,4 +180,3 @@ public class BitBit {
         return "NOT SET UP YET";
     }
 }
-//Stupid comment
