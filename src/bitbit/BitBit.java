@@ -81,7 +81,8 @@ public class BitBit {
         }
         return array2D;
     }
-
+   
+    //console display
     public static void displayArray2D(int[][] color, int xMax, int yMax) {
         System.out.println("Width:" + width + ", Height:"
                 + height);
