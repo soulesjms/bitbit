@@ -68,15 +68,8 @@ public class BitBit {
         for (int yPixel = 0; yPixel < image.getHeight(); yPixel++) {
             for (int xPixel = 0; xPixel < image.getWidth(); xPixel++) {
                 int color = image.getRGB(xPixel, yPixel);
-                {
-                   System.out.print("Adding color: " + intToHex(color));
-                    System.out.println("  R=" + intToHex(color).substring(2, 4)
-                                      + " G=" + intToHex(color).substring(4, 6)
-                                      + " B=" + intToHex(color).substring(6, 8)
-                               + " Special: " + intToHex(color).substring(0, 2)
-                            + " to 2d array, X=" + xPixel + " Y=" + yPixel);
-                    array2D[xPixel][yPixel] = color;
-                }
+                displayColorInfo(xPixel, yPixel, color);
+                array2D[xPixel][yPixel] = color;
             }
         }
         return array2D;
@@ -178,5 +171,15 @@ public class BitBit {
         }
         System.out.print(ANSI_RESET);
         return "NOT SET UP YET";
+    }
+
+    public void displayColorInfo(int x, int y, int color) {
+
+        System.out.print("Adding color: " + intToHex(color));
+        System.out.println("  R=" + intToHex(color).substring(2, 4)
+                + " G=" + intToHex(color).substring(4, 6)
+                + " B=" + intToHex(color).substring(6, 8)
+                + " Special=" + intToHex(color).substring(0, 2)
+                + " to 2d array, X=" + x + " Y=" + y);
     }
 }
