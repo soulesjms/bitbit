@@ -20,8 +20,8 @@ import javax.imageio.ImageIO;
 public class BitBit {
 
     //TODO: switch to be in object
-    static int width;
-    static int height;
+    static int width = 0;
+    static int height = 0;
 
     /**
      * @param args the command line arguments
