@@ -172,6 +172,7 @@ public class BitBit {
         System.out.print(ANSI_RESET);
         return "NOT SET UP YET";
     }
+<<<<<<< HEAD
 
     public void displayColorInfo(int x, int y, int color) {
 
@@ -183,3 +184,7 @@ public class BitBit {
                 + " to 2d array, X=" + x + " Y=" + y);
     }
 }
+=======
+}
+//Stupid comment
+>>>>>>> 6322dd1... Added stupid comment
