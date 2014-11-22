@@ -400,11 +400,17 @@ public class BmpImage
     {
         try
         {
-            String fileName = args[0];
-            FileInputStream inFile = new FileInputStream(fileName);
+            String fileInput;
+            if (args.length < 1) {
+               fileInput = "/home/adam/Desktop/fun.bmp";
+            }
+            else {
+                 fileInput = args[0];
+            }
+            FileInputStream inFile = new FileInputStream(fileInput);
             DataInputStream is = new DataInputStream( new BufferedInputStream(inFile) );
             
-            BmpImage im = new BmpImage(fileName);
+            BmpImage im = new BmpImage(fileInput);
             ImageProducer img = im.extractImage(is);
             System.out.println("Output:\n" + im);
         }

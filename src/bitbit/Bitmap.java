@@ -62,10 +62,17 @@ public class Bitmap {
     {
         try
         {
-            FileInputStream inFile = new FileInputStream(args[0]);
+            String fileInput;
+            if (args.length < 1) {
+               fileInput = "/home/adam/Desktop/fun.bmp";
+            }
+            else {
+                 fileInput = args[0];
+            }
+            FileInputStream inFile = new FileInputStream(fileInput);
             DataInputStream is = new DataInputStream( new BufferedInputStream(inFile) );
             
-            BmpImage im = new BmpImage(args[0]);
+            BmpImage im = new BmpImage(fileInput);
             ImageProducer img = im.extractImage(is);
             System.out.println("Output:\n" + im);
         }
