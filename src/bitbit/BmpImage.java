@@ -112,6 +112,7 @@ public class BmpImage
                 reds[x] = is.readByte();
                 if ( windowsStyle )
                     is.skipBytes(1);
+                System.err.println("Color Table " + x + " R: " + BitBit.intToHex(reds[x]) + " G: " + BitBit.intToHex(greens[x]) + " B: " + BitBit.intToHex(blues[x]));
             }
             colorModel = new IndexColorModel( biBitCount, numColors,
                                      reds, greens, blues );
@@ -258,10 +259,12 @@ public class BmpImage
         {
         case 1:
             throw new AWTException("Unhandled bits/pixel: " + biBitCount);
-        case 4:  extract4BitData(is); break;
-        case 8:  extract8BitData(is); break;
+        case 4:  extract4BitData(is); 
+        System.out.println("8-bit Image"); break;
+        case 8:  extract8BitData(is); 
+        System.out.println("8-bit Image"); break;
         case 24:
-            throw new AWTException("Unhandled bits/pixel: " + biBitCount);
+            throw new AWTException("24-bit is Unhandled bits/pixel: " + biBitCount);
         default:
             throw new AWTException("Invalid bits per pixel: " + biBitCount);
         }
@@ -307,14 +310,15 @@ public class BmpImage
             buf.append("header size: " + biSize + "\n");
             buf.append("      width: " + biWidth + "\n");
             buf.append("     height: " + biHeight + "\n");
-            buf.append(" clr planes: " + biPlanes + "\n");
+            //Commented out the following to simplify output
+            //buf.append(" clr planes: " + biPlanes + "\n");
             buf.append(" bits/pixel: " + biBitCount + "\n");
             if ( windowsStyle )
             {
-                buf.append("compression: " + biCompression + "\n");
-                buf.append(" image size: " + biSizeImage + "\n");
-                buf.append("Xpels/meter: " + biXPelsPerMeter + "\n");
-                buf.append("Ypels/meter: " + biYPelsPerMeter + "\n");
+            //    buf.append("compression: " + biCompression + "\n");
+            //    buf.append(" image size: " + biSizeImage + "\n");
+            //    buf.append("Xpels/meter: " + biXPelsPerMeter + "\n");
+            //    buf.append("Ypels/meter: " + biYPelsPerMeter + "\n");
                 buf.append("colors used: " + biClrUsed + "\n");
                 buf.append("primary clr: " + biClrImportant + "\n");
             }
@@ -396,10 +400,11 @@ public class BmpImage
     {
         try
         {
-            FileInputStream inFile = new FileInputStream(args[0]);
+            String fileName = args[0];
+            FileInputStream inFile = new FileInputStream(fileName);
             DataInputStream is = new DataInputStream( new BufferedInputStream(inFile) );
             
-            BmpImage im = new BmpImage(args[0]);
+            BmpImage im = new BmpImage(fileName);
             ImageProducer img = im.extractImage(is);
             System.out.println("Output:\n" + im);
         }
