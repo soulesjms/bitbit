@@ -30,6 +30,9 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
 
 /**
  * CONTRIBUTORS: Tyler Scott, Eric Eslick
@@ -76,6 +79,7 @@ public class ScriptureJournalApp extends Application {
     Menu scriptureView = new Menu("All Scriptures");
     Menu help = new Menu("Help");
     MenuItem visitWebsite = new MenuItem("Visit Website");
+    MenuItem showBooksFile = new MenuItem("Show Books");
 //GUI boxes, toolbars, and panes
     BorderPane root = new BorderPane();
     MenuBar mainMenu = new MenuBar();
@@ -94,8 +98,8 @@ public class ScriptureJournalApp extends Application {
         if (args.length < 1) {
             System.out.println("Error: " + args.length
                     + " args, PLEASE PASS IN FILE TO LOAD, defaults will be loaded this time...");
-            inFile = FileServices.workDir + "src/yay.xml";
-            //inFile = FileServices.workDir + "src/journ.txt";
+            inFile = PropResources.getPropResources().getDefaultJournalXML();
+            //inFile = FileServices.workDir + PropResources.getPropResources().getDefaultJournalTxt();
         } else if (args.length == 1) {
             inFile = args[0];
         }
@@ -143,7 +147,7 @@ public class ScriptureJournalApp extends Application {
 
         defaultSetupJournal();
         setupBars();
-        setupMenus();
+        setupMenus(primaryStage);
 
         fileBoxes(primaryStage);
          
@@ -290,16 +294,58 @@ public class ScriptureJournalApp extends Application {
         listView.setItems(entriesOList);
         listView.setPrefWidth(175);
         listView.setPrefHeight(255);
+        listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
+            @Override
+            public void handle(MouseEvent event) {
+                System.out.println("Opening");
+                Entry selectedItem = listView.getSelectionModel().getSelectedItem();
+                System.out.println(selectedItem.getDate());
+                entryField.clear();
+                entryField.setText(selectedItem.getContent());
+                String currDate = selectedItem.getDate();
+                dateLbl.textProperty().setValue(currDate);
+                scripturesOList.clear();
+                for (Scripture sCurr : selectedItem.getScriptures()) {
+                    scripturesOList.add(sCurr);
+                }
+                topicsOList.clear();
+                for (Topic tCurr : selectedItem.getTopics()) {
+                    topicsOList.add(tCurr);
+                }
+                updateWordCount();
+            }
+        });
+        
         sListView.setItems(scripturesOList);
         sListView.setPrefWidth(175);
-        sListView.setPrefHeight(100);
-       
+        sListView.setPrefHeight(100);      
+        
+        sListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent event) {
+                String search;
+                Scripture selectedItem = sListView.getSelectionModel().getSelectedItem();
+                search = selectedItem.toUrl();
+                VisitWebsite vW = new VisitWebsite(search);
+                Thread t = new Thread(vW);
+                t.start();//does vW.run(); in a thread
+            }
+        });
+        
         tListView.setItems(topicsOList);
         tListView.setPrefWidth(175);
         tListView.setPrefHeight(100);
+        tListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
+            @Override
+            public void handle(MouseEvent event) {
+
+            }
+        });
     }
+
     public void setupLabels() {
         scriptureLbl.textProperty().setValue("Scriptures");
         topicLbl.textProperty().setValue("Topics");
@@ -322,7 +368,7 @@ public class ScriptureJournalApp extends Application {
             System.err.println(inFile + " is not a valid file to load");
         }
     }
-    public void setupMenus() {
+    public void setupMenus(final Stage primaryStage) {
                 //Create SubMenu File.
         openFile.setAccelerator(KeyCombination.keyCombination("Ctrl+O"));
         saveAs.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+S"));
@@ -372,7 +418,21 @@ public class ScriptureJournalApp extends Application {
                 t.start();//does vW.run(); in a thread
             }
         });
-
+        
+        showBooksFile.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                final Stage dialog = new Stage();
+                dialog.initModality(Modality.APPLICATION_MODAL);
+                dialog.initOwner(primaryStage);
+                VBox dialogVbox = new VBox(20);
+                dialogVbox.getChildren().add(new Text("TODO:print books file"));
+                Scene dialogScene = new Scene(dialogVbox, 300, 200);
+                dialog.setScene(dialogScene);
+                dialog.show();
+            }
+         });
+    
         //Create SubMenu Edit.
         edit.getItems().add(clearAll);
         
@@ -430,7 +490,7 @@ public class ScriptureJournalApp extends Application {
             }
         }
         //Create SubMenu Help.
-        help.getItems().add(visitWebsite);
+        help.getItems().addAll(visitWebsite, showBooksFile);
 
         mainMenu.getMenus().addAll(file, edit, topicView, scriptureView, help);
     }
@@ -518,11 +578,11 @@ public class ScriptureJournalApp extends Application {
     }
 
     public void setupBars() {
-         progressBar1.progressProperty().bind(barThread1.processProperty);
+        progressBar1.progressProperty().bind(barThread1.processProperty);
         Thread t1 = new Thread(barThread1);
         t1.start();
-        if (barThread1.processProperty.equals((double)1)) {
-        progBar1Lbl.textProperty().setValue("DONE");
+        if (barThread1.processProperty.equals((double) 1)) {
+            progBar1Lbl.textProperty().setValue("DONE");
         }
     }
 
@@ -530,7 +590,7 @@ public class ScriptureJournalApp extends Application {
         Integer wordCount = ScriptureJournalApp.CountWords(entryField.getText());
         entryField.setTooltip(new Tooltip("Word count: " + wordCount.toString()));
         Integer selWordCount = ScriptureJournalApp.CountWords(entryField.getSelectedText());
-        wordCountLbl.textProperty().setValue("              Word count: Entry: " + wordCount.toString()
+        wordCountLbl.textProperty().setValue("              Word count: " + wordCount.toString()
                                  + "   Highlighted: " + selWordCount.toString());
     }
 }

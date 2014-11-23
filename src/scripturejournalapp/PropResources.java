@@ -23,17 +23,25 @@ public class PropResources {
     private String topicsFile;
     private String scripturesFile;
     private String propFileName;
+    private String defaultDirectory;
+    private String defaultJournalXML;
+    private String defaultJournalTxt;
     
-    public PropResources() {
+    private static PropResources pr = new PropResources();
+        
+    private PropResources() {
         this.propFileName = "journal.properties";
         getPropValues();
     }
     
-    public PropResources(String pFileName) {
+    private PropResources(String pFileName) {
         this.propFileName = pFileName;
         getPropValues();
     }
     
+    public static PropResources getPropResources() {
+        return pr;
+    }
     /* getPropValues
      * pretty much a giant setter called by the constructor
      * that grabs the config information from a properties file
@@ -55,8 +63,11 @@ public class PropResources {
             }
         }
         // get property values
-        this.topicsFile = prop.getProperty("topics");
-        this.scripturesFile = prop.getProperty("scriptures");
+        this.defaultDirectory = prop.getProperty("defaultDirectory");
+        this.topicsFile = this.defaultDirectory + prop.getProperty("topics");
+        this.scripturesFile = this.defaultDirectory + prop.getProperty("scriptures");
+        this.defaultJournalXML = this.defaultDirectory + prop.getProperty("defaultJournalXML");
+        this.defaultJournalTxt = this.defaultDirectory + prop.getProperty("defaultJournalTxt");
     }
     
     public String getTopicsFile() {
@@ -67,9 +78,24 @@ public class PropResources {
         return scripturesFile;
     }
     
+     public String getDirectory() {
+        return defaultDirectory;
+    }
+    
     public static void main(String [] args) {
             PropResources pr = new PropResources();
             System.out.println("PROPERTIES: " + pr.getTopicsFile()
-                                              + " " + pr.getScripturesFile());
+                                        + " \t\n" + pr.getScripturesFile()
+                                        + " \t\n" + pr.getDirectory()
+                                        + " \t\n" + pr.getDefaultJournalXML()
+                                        + " \t\n" + pr.getDefaultJournalTxt());
+    }
+
+    String getDefaultJournalXML() {
+        return this.defaultJournalXML;
+    }
+    
+    String getDefaultJournalTxt() {
+        return this.defaultJournalTxt;
     }
 }

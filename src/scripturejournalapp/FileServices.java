@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 //List
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 //Document
@@ -47,18 +46,19 @@ import org.xml.sax.SAXException;
  * @author adam
  */
 public class FileServices implements Runnable {
-
+    
+    static final String workDir = PropResources.getPropResources().getDirectory();
     @Override
     public void run() {
 
     }
 
     public static void main(String[] args) {
-        String txtFileIn = "/home/adam/Downloads/journ.txt";
-        String xmlFileIn = "/home/adam/Desktop/yay.xml";
-        String outTxtFile = "/home/adam/Desktop/out.txt";
-       String outXmlFile = "/home/adam/Desktop/out.xml";
-         FileServices mS4 = new FileServices();
+        String txtFileIn = workDir + "src/journ.txt";
+        String xmlFileIn = workDir + "src/yay.xml";
+        String outTxtFile = workDir + "src/out.txt";
+        String outXmlFile = workDir + "src/out.xml";
+        FileServices mS4 = new FileServices();
         Journal j = new Journal();
         j = mS4.txtToJournal(txtFileIn);
         try {
@@ -89,7 +89,6 @@ public class FileServices implements Runnable {
     }
 
     //hydrates Journal with text file journal
-
     public Journal txtToJournal(String file) {
         Journal j = new Journal();
         String dateKey = "[0-9]{4}-[0-9]{2}-[0-9]{2}";
@@ -112,24 +111,6 @@ public class FileServices implements Runnable {
                     }
                     j.add(e);
                 }
-                //Goes through this line for adding scriptures
-//                for (String iList : Index.getIndex().getBooks()) {
-//                    for (String bItem : regexChecker((iList + scriptureKey), line)) {
-//                        e.addScripture(new Scripture(bItem));
-//                    }
-//                }
-                //Also can be eliminated because Entry takes care of it in addContent
-//                List<String> foundTopics = new ArrayList<>();
-//                for (Map.Entry<String, List<String>> entry : Index.getIndex().getTMap().entrySet()) {
-//                    String key = entry.getKey();
-//                    for (String value : entry.getValue()) {
-//                        foundTopics = regexChecker((value), line);
-//                        for (String bItem : foundTopics) {
-//                            e.addTopic(Index.getIndex().getTopicTitle(bItem));
-//                        }
-//                    }
-//                }
-                //Generic matcher
                 Matcher anyMatcher = allPat.matcher(line);
                 while (anyMatcher.find()) {
                     //needles in the haystack:
@@ -170,44 +151,6 @@ public class FileServices implements Runnable {
                     String date = eElement.getAttribute("date");
                     e = new Entry();
                     e.setDate(date);
-                    //loop through scriptures in this entry
-                    //WHY I COMMENTED THIS OUT: it works perfectly, I just found 
-                    // a way for the Entry class to take care of it in 3 lines
-                    //if for some reason you don't want to rely on the entry class,
-                    //here is the code:
-//                    for (int k = 0; k < eElement.getElementsByTagName("scripture").getLength(); k++) {
-//                        Element ement = (Element) eElement.getElementsByTagName("scripture").item(k);
-//                        String book = "";
-//                        String chapter = "";
-//                        String sVerse = "";
-//                        String eVerse = "";
-//                        if (ement.hasAttribute("book")) {
-//                            book = ement.getAttribute("book");
-//                        }
-//                        if (ement.hasAttribute("chapter")) {
-//                            chapter = ement.getAttribute("chapter");
-//                        }
-//                        if (ement.hasAttribute("startverse")) {
-//                            sVerse = ement.getAttribute("startverse");
-//                        }
-//                        if (ement.hasAttribute("endverse")) {
-//                            eVerse = ement.getAttribute("endverse");
-//                        }
-//                        String scrip = book + " " + chapter;
-//                        if (!sVerse.isEmpty()) {
-//                            scrip += ":" + sVerse;
-//                            if (!eVerse.isEmpty()) {
-//                                scrip += "-" + eVerse;
-//                            }
-//                        }
-//                        e.addScripture(scrip);
-//                    }
-                    //loop for loading topics
-//                    for (int k = 0; k < eElement.getElementsByTagName("topic").getLength(); k++) {
-//                        Element tElement = (Element) eElement.getElementsByTagName("topic").item(k);
-//                        String topic = tElement.getTextContent();
-//                        e.addTopic(topic);
-//                    }
                     //add content
                     Element cElement = (Element) eElement.getElementsByTagName("content").item(0);
                     String content = cElement.getTextContent();
@@ -275,7 +218,7 @@ public class FileServices implements Runnable {
 
             Result output = new StreamResult(new File(outFile));
             Source input = new DOMSource(myDocument);
-
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.transform(input, output);
         } catch (TransformerConfigurationException ex) {
             Logger.getLogger(FileServices.class.getName()).log(Level.SEVERE, null, ex);

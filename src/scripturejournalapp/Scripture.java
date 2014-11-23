@@ -18,6 +18,7 @@ public class Scripture {
     private String startVerse;
     private String endVerse;
     final   String scriptureKey = ("(\\s+(chapter)?)?\\s+\\d+:?\\d*");
+    final   String ldsPrefix = "https://www.lds.org/scriptures/search?lang=eng&type=verse&query=";
 
     public Scripture() {
 
@@ -44,7 +45,7 @@ public class Scripture {
     }
 
     public String toUrl() {
-        String scrip;
+        String scrip = ldsPrefix;
         String bookChecked;
         if (this.book.contains(" ")) {
             bookChecked = this.book.replace(" ", "+");
@@ -52,8 +53,7 @@ public class Scripture {
         else {
             bookChecked = this.book;
         }
-        scrip = "https://www.lds.org/scriptures/search?lang=eng&type=verse&query="
-                + bookChecked;
+        scrip += bookChecked;
         if (!this.chapter.isEmpty()) {
             scrip += "+" + this.chapter;
             if (!this.startVerse.isEmpty()) {

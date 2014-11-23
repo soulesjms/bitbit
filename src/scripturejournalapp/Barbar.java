@@ -5,8 +5,6 @@
  */
 package scripturejournalapp;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.DoubleProperty;
@@ -21,28 +19,36 @@ public class Barbar implements Runnable {
     //private vars
 
     private Integer delayInMili = 1000;
-    private int currNum = 0;
+    private int curNum = 0;
     private int maxCount = 100;
 
     DoubleProperty processProperty;
 
+    public void setCurNum(int num) {
+        this.curNum = num;
+    }
+
+    public int getCurNum() {
+        return this.curNum;
+    }
+
     public Barbar(Integer delayMili, int max) {
         this.delayInMili = delayMili;
         this.maxCount = max;
-        processProperty = new SimpleDoubleProperty(this.currNum);
+        processProperty = new SimpleDoubleProperty(this.curNum);
     }
 
     @Override
     public void run() {
-        for (int i = 0; i < this.maxCount; i++) {
+        for (int i = 0; i <= this.maxCount; i++) {
             try {
                 Thread.sleep(this.delayInMili);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Barbar.class.getName()).log(Level.SEVERE, null, ex);
             }
-            this.currNum = i;
-            processProperty.set((double) (this.currNum) / (double) this.maxCount);
-            System.out.println("counting: " + this.currNum);
+            this.curNum = i;
+            processProperty.set((double) (this.curNum) / (double) this.maxCount);
+            System.out.println("counting: " + this.curNum);
         }
     }
 

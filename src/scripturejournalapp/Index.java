@@ -18,7 +18,6 @@ import java.util.logging.Logger;
  *
  * @author adam
  */
-//TODO: make Index constructor private, only allowing one at a time, same for all
 public class Index {
     private static Index ind = new Index();
     private List<String> books;
@@ -137,10 +136,10 @@ public class Index {
         return list;
     }
 
+    //TODO: propFileName not used, fix it
     private void loadPropertiesToLists(String propFileName) {
-        PropResources pr = new PropResources(propFileName);
-        this.topics = loadList(pr.getTopicsFile());
-        this.books = loadList(pr.getScripturesFile());
+        this.topics = loadList(PropResources.getPropResources().getTopicsFile());
+        this.books = loadList(PropResources.getPropResources().getScripturesFile());
     }
     
     public List<String> getBooks() {
@@ -174,6 +173,5 @@ public class Index {
                 System.out.println("Sorry, " + iTest + " is not a topic.");
             }
         }
-        //ind.printMap(ind.tMap);
     }
 }
