@@ -136,9 +136,8 @@ public class ScriptureTester {
 
     @Test
     public void propertiesTest() {
-        PropResources pr = new PropResources();
-        Assert.assertEquals(pr.getScripturesFile(), "/home/adam/Downloads/books.txt");
-        Assert.assertEquals(pr.getTopicsFile(), "/home/adam/Downloads/topics.txt");
+        Assert.assertEquals(PropResources.getPropResources().getScripturesFile(), "/home/adam/Downloads/books.txt");
+        Assert.assertEquals(PropResources.getPropResources().getTopicsFile(), "/home/adam/Downloads/topics.txt");
     }
 
     @Test
