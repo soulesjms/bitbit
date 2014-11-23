@@ -105,6 +105,14 @@ public class BmpImage
             reds = new byte[numColors];
             blues = new byte[numColors];
             greens = new byte[numColors];
+            System.out.print(" ");
+            for ( int x = 0; x < numColors; x++ ) {
+                System.out.print(x);
+                if (x < numColors - 1) {
+                    System.out.print(",");
+                }
+            }
+            System.out.println();
             for ( int x = 0; x < numColors; x++ )
             {
                 blues[x] = is.readByte();
@@ -112,8 +120,12 @@ public class BmpImage
                 reds[x] = is.readByte();
                 if ( windowsStyle )
                     is.skipBytes(1);
-                System.err.println("Color Table " + x + " R: " + BitBit.intToHex(reds[x]) + " G: " + BitBit.intToHex(greens[x]) + " B: " + BitBit.intToHex(blues[x]));
+               //Print color table in color text
+                BitBit.displayPixel(BitBit.intToHex(reds[x], 2),
+                                    BitBit.intToHex(greens[x], 2),
+                                    BitBit.intToHex(blues[x], 2));
             }
+            System.out.println();
             colorModel = new IndexColorModel( biBitCount, numColors,
                                      reds, greens, blues );
         }
