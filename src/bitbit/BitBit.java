@@ -30,17 +30,18 @@ public class BitBit {
         try {
             int[][] bitmap;
             if (args.length == 0) {
-                String temp = null;
-                BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
-                try {
+                String temp;
+/*                BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
+             try {
                     System.out.println("(Use param 1 next time!)Path of Image to Load:");
                     temp = userInput.readLine();
                 } catch (IOException ex) {
                     Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                } */
+               temp = "/home/adam/Desktop/fun.bmp";
                 bitmap = new BitBit().seeBMPImage(temp);
                 //YOU MAY OPTIONALLY SWITCH OUT THE FOLLOWING LINE WITH THE LAST ONE WITH YOUR PATH TO THE IMAGE
-//                bitmap = new BitBit().seeBMPImage("/home/adam/Desktop/wink.bmp");
+        //    bitmap = new BitBit().seeBMPImage("/home/adam/Desktop/fun.bmp");
             } else {
                 bitmap = new BitBit().seeBMPImage(args[0]);
             }
@@ -68,7 +69,7 @@ public class BitBit {
         for (int yPixel = 0; yPixel < image.getHeight(); yPixel++) {
             for (int xPixel = 0; xPixel < image.getWidth(); xPixel++) {
                 int color = image.getRGB(xPixel, yPixel);
-                displayColorInfo(xPixel, yPixel, color);
+                //displayColorInfo(xPixel, yPixel, color);
                 array2D[xPixel][yPixel] = color;
             }
         }
@@ -100,8 +101,8 @@ public class BitBit {
                 String g = intToHex(color[xPixel][yPixel]).substring(4, 6);
                 String b = intToHex(color[xPixel][yPixel]).substring(6, 8);
                 String s = intToHex(color[xPixel][yPixel]).substring(0, 2);
-                //print here
-                getInkColor(hexToInt(r), hexToInt(g), hexToInt(b), hexToInt(s));
+                //print each pixel in color here
+                displayPixel(hexToInt(r), hexToInt(g), hexToInt(b), hexToInt(s));
             }
             System.out.println();
         }
@@ -111,9 +112,17 @@ public class BitBit {
     //TODO: complete toHex method here:
     public static String intToHex(int val) {
         String hex = Integer.toHexString(val);
-
-        int parsedResult = (int) Long.parseLong(hex, 16);
+      //  int parsedResult = (int) Long.parseLong(hex, 16);
         //System.out.println(parsedResult);
+        return hex;
+    }
+    
+    //chops off excess at len
+    public static String intToHex(int i, int len) {
+        String hex = intToHex(i);  
+        if (hex.length() > len) {
+            hex = hex.substring(0, len);
+        }
         return hex;
     }
 
@@ -149,9 +158,23 @@ public class BitBit {
         }
         return stride;
     }
+    
+    public static String displayPixel(int r, int g, int b) {
+        return displayPixel(r, g, b, -1);
+    }
+     
+    public static String displayPixel(String rS, String gS, String bS) {
+        int r, g, b;
+        r = hexToInt(rS);
+        g = hexToInt(gS);
+        b = hexToInt(bS);
+        return displayPixel(r, g, b, -1);
+    }
+    
     //TODO: have it return, not display
     //contains logic for deciding colors
-    public static String getInkColor(int r, int g, int b, int s) {
+    public static String displayPixel(int r, int g, int b, int s) {
+        String colorString = "Not implemented yet";
         if (b < 50 && r < 50 && g < 50) {
             System.out.print(ANSI_BLACK + "[" + "b" + "");
         } else if (b < 50 && r > 50 && g < 50) {
@@ -170,7 +193,7 @@ public class BitBit {
             System.out.print(ANSI_CYAN + "[" + "?" + "");
         }
         System.out.print(ANSI_RESET);
-        return "NOT SET UP YET";
+        return "Not Yet Implemented";//colorString;
     }
 
     public void displayColorInfo(int x, int y, int color) {
