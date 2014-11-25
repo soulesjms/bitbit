@@ -121,13 +121,14 @@ public class BmpImage
                 if ( windowsStyle )
                     is.skipBytes(1);
                //Print color table in color text
-                BitBit.displayPixel(BitBit.intToHex(reds[x], 2),
-                                    BitBit.intToHex(greens[x], 2),
-                                    BitBit.intToHex(blues[x], 2));
+                PicTerm.displayPixel(PicTerm.intToHex(reds[x], 2),
+                                    PicTerm.intToHex(greens[x], 2),
+                                    PicTerm.intToHex(blues[x], 2));
             }
             System.out.println();
             colorModel = new IndexColorModel( biBitCount, numColors,
                                      reds, greens, blues );
+            
         }
     }
 

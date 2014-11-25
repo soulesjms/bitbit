@@ -3,206 +3,180 @@
  */
 package bitbit;
 
-import static bitbit.ColorConsole.*;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
+import javafx.application.Application;
+import static javafx.application.Application.launch;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ToolBar;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 /**
  *
  * @author adam and mark
  */
-public class BitBit {
+public class BitBit extends Application {
 
-    //TODO: switch to be in object
-    static int width = 0;
-    static int height = 0;
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        try {
-            int[][] bitmap;
-            if (args.length == 0) {
-                String temp;
-/*                BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
-             try {
-                    System.out.println("(Use param 1 next time!)Path of Image to Load:");
-                    temp = userInput.readLine();
-                } catch (IOException ex) {
-                    Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
-                } */
-               temp = "/home/adam/Desktop/fun.bmp";
-                bitmap = new BitBit().seeBMPImage(temp);
-                //YOU MAY OPTIONALLY SWITCH OUT THE FOLLOWING LINE WITH THE LAST ONE WITH YOUR PATH TO THE IMAGE
-        //    bitmap = new BitBit().seeBMPImage("/home/adam/Desktop/fun.bmp");
-            } else {
-                bitmap = new BitBit().seeBMPImage(args[0]);
-            }
-            BitBit.displayArray2D(bitmap, width, height);
-        } catch (IOException ex) {
-            Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        BufferedReader dataIn = new BufferedReader(new InputStreamReader(System.in));
-        try {
-            System.out.println("Press ENTER to end...");
-            String temp = dataIn.readLine();
-        } catch (IOException ex) {
-            Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public int[][] seeBMPImage(String BMPFileName) throws IOException {
-
-        BufferedImage image = null;
-        image = ImageIO.read(new File(BMPFileName));
-        int[][] array2D = new int[image.getWidth()][image.getHeight()];
-        //TODO: put width and height in an object
-        width = image.getWidth();
-        height = image.getHeight();
-        for (int yPixel = 0; yPixel < image.getHeight(); yPixel++) {
-            for (int xPixel = 0; xPixel < image.getWidth(); xPixel++) {
-                int color = image.getRGB(xPixel, yPixel);
-                //displayColorInfo(xPixel, yPixel, color);
-                array2D[xPixel][yPixel] = color;
-            }
-        }
-        return array2D;
-    }
-
-    public static void displayArray2D(int[][] color, int xMax, int yMax) {
-        System.out.println("Width:" + width + ", Height:"
-                + height);
-        int stride = 1;
-        int termWidth = 208 / 2;
-        stride = computeStride(termWidth);
-        System.out.print("   ");
-        System.out.println(" X");
-        for (int yPixel = 0; yPixel < yMax; yPixel += stride) {
-            //allignment of line number spacing
-            System.out.print(yPixel);//line numbers
-            if (yPixel < 10) {
-                System.out.print(" ");
-            }
-            if (yPixel < 100) {
-                System.out.print(" ");
-            }
-            if (height > 99 && yPixel < 1000) {
-                System.out.print(" ");
-            }
-            for (int xPixel = 0; xPixel < xMax; xPixel += stride) {
-                String r = intToHex(color[xPixel][yPixel]).substring(2, 4);
-                String g = intToHex(color[xPixel][yPixel]).substring(4, 6);
-                String b = intToHex(color[xPixel][yPixel]).substring(6, 8);
-                String s = intToHex(color[xPixel][yPixel]).substring(0, 2);
-                //print each pixel in color here
-                displayPixel(hexToInt(r), hexToInt(g), hexToInt(b), hexToInt(s));
-            }
-            System.out.println();
-        }
-        System.out.println(" Y");
-    }
-
-    //TODO: complete toHex method here:
-    public static String intToHex(int val) {
-        String hex = Integer.toHexString(val);
-      //  int parsedResult = (int) Long.parseLong(hex, 16);
-        //System.out.println(parsedResult);
-        return hex;
+    final String website = "http://www.github.com/zvakanaka/bitbit";
+//GUI boxes, toolbars, and panes
+    BorderPane root = new BorderPane();
+    MenuBar mainMenu = new MenuBar();
+    ToolBar toolBar = new ToolBar();
+    VBox topContainer = new VBox();
+//Menus
+    Menu file = new Menu("File");
+    MenuItem openFile = new MenuItem("Open File");
+    MenuItem saveAs = new MenuItem("Save as...");
+    MenuItem saveBtn = new MenuItem("Save");
+    MenuItem exitApp = new MenuItem("Exit");
+    Menu edit = new Menu("Edit");
+    MenuItem clearAll = new MenuItem("New entry");
+    Menu help = new Menu("Help");
+    MenuItem visitWebsite = new MenuItem("Visit Website");
+    MenuItem showHelp = new MenuItem("Show Help");
+    
+    public static void main(String[] args){
+        //Launch javafx GUI!
+        launch(args);
     }
     
-    //chops off excess at len
-    public static String intToHex(int i, int len) {
-        String hex = intToHex(i);  
-        if (hex.length() > len) {
-            hex = hex.substring(0, len);
-        }
-        return hex;
+     @Override
+    public void start(final Stage primaryStage) {
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+         
+        setupMenus(primaryStage);
+        setupFileBoxes(primaryStage);
+                
+        Scene scene = new Scene(root, 300, 200);
+        
+        //Add the ToolBar and Main Menu to the VBox
+        topContainer.getChildren().add(mainMenu);
+        topContainer.getChildren().add(toolBar);
+        root.setTop(grid);
+
+        //col, row, coltakeup, rowtakeup
+        grid.add(mainMenu, 0, 0, 6, 1);
+                
+        primaryStage.setTitle("BitBit");
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
-    public static int hexToInt(String hexString) {
-        int val = Integer.valueOf(hexString, 16).intValue();
-        //System.out.println(val);
-        return val;
+    //a sort of destructor
+    @Override
+    public void stop() {
+        System.out.println("Bye");
+    }
+     public void setupMenus(final Stage primaryStage) {
+                //Create SubMenu File.
+        openFile.setAccelerator(KeyCombination.keyCombination("Ctrl+O"));
+        saveAs.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+S"));
+        saveBtn.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
+        exitApp.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
+        file.getItems().addAll(openFile, saveBtn, saveAs, exitApp);
+
+        saveBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                //save file here
+            }
+        });
+        clearAll.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            }
+        });
+
+
+        exitApp.setOnAction(new EventHandler<ActionEvent>() {
+           @Override
+           public void handle(ActionEvent event) {
+               System.exit(0);
+            }
+        });
+
+        visitWebsite.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                VisitWebsite vW = new VisitWebsite(website);
+                Thread t = new Thread(vW);
+                t.start();//does vW.run(); in a thread
+            }
+        });
+        
+        showHelp.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                final Stage dialog = new Stage();
+                dialog.initModality(Modality.APPLICATION_MODAL);
+                dialog.initOwner(primaryStage);
+                VBox dialogVbox = new VBox(20);
+                dialogVbox.getChildren().add(new Text("TODO:print help file"));
+                Scene dialogScene = new Scene(dialogVbox, 300, 200);
+                dialog.setScene(dialogScene);
+                dialog.show();
+            }
+         });
+    
+        //Create SubMenu Edit.
+        edit.getItems().add(clearAll);
+       
+        //Create SubMenu Help.
+        help.getItems().addAll(visitWebsite, showHelp);
+
+        mainMenu.getMenus().addAll(file, edit, help);
     }
 
-    //for big images, we want to skip pixels
-    public static int computeStride(int termWidth) {
-        int stride = 1;
-        if (width > termWidth) {
-            stride *= 2;
-            if (width > termWidth * 2) {
-                stride *= 2;
-                if (width > termWidth * 4) {
-                    stride *= 2;
-                    if (width > termWidth * 8) {
-                        stride *= 2;
-                        if (width > termWidth * 16) {
-                            stride *= 2;
-                            if (width > termWidth * 32) {
-                                stride *= 2;
-                                if (width > termWidth * 64) {
-                                    stride *= 2;
-                                }
-                            }
-                        }
+    public void setupFileBoxes(final Stage primaryStage) {
+        saveAs.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                FileChooser fileChooser1 = new FileChooser();
+                fileChooser1.setTitle("Save bmp");
+                File file = fileChooser1.showSaveDialog(primaryStage);
+                if (file != null) {
+                    String fileName = file.getPath();
+                    if (fileName.toLowerCase().contains(".bmp")) {
+                        System.out.println("TODO: save file to here");
+                    } 
+                    else {
+                        System.out.println("Not good to save to that type of file");
                     }
+                } else {
+                    System.out.println("ERROR: save path is empty");
                 }
             }
-        }
-        return stride;
-    }
-    
-    public static String displayPixel(int r, int g, int b) {
-        return displayPixel(r, g, b, -1);
-    }
-     
-    public static String displayPixel(String rS, String gS, String bS) {
-        int r, g, b;
-        r = hexToInt(rS);
-        g = hexToInt(gS);
-        b = hexToInt(bS);
-        return displayPixel(r, g, b, -1);
-    }
-    
-    //TODO: have it return, not display
-    //contains logic for deciding colors
-    public static String displayPixel(int r, int g, int b, int s) {
-        String colorString = "Not implemented yet";
-        if (b < 50 && r < 50 && g < 50) {
-            System.out.print(ANSI_BLACK + "[" + "b" + "");
-        } else if (b < 50 && r > 50 && g < 50) {
-            System.out.print(ANSI_RED + "[" + "R" + "");
-        } else if (b < 150 && r < 100 && g > 50) {
-            System.out.print(ANSI_GREEN + "[" + "G" + "");
-        } else if (b > 50 && r < 50 && g < 50) {
-            System.out.print(ANSI_BLUE + "[" + "B" + "");
-        } else if (b > 50 && r > 50 && g < 70) {
-            System.out.print(ANSI_PURPLE + "[" + "P" + "");
-        } else if (b > 150 && r > 150 && g > 150) {
-            System.out.print(ANSI_WHITE + "[" + "W" + "");
-        } else if (b < 50 && r > 50 && g > 50) {
-            System.out.print(ANSI_YELLOW + "[" + "Y" + "");
-        } else {
-            System.out.print(ANSI_CYAN + "[" + "?" + "");
-        }
-        System.out.print(ANSI_RESET);
-        return "Not Yet Implemented";//colorString;
-    }
+        });
 
-    public void displayColorInfo(int x, int y, int color) {
-
-        System.out.print("Adding color: " + intToHex(color));
-        System.out.println("  R=" + intToHex(color).substring(2, 4)
-                + " G=" + intToHex(color).substring(4, 6)
-                + " B=" + intToHex(color).substring(6, 8)
-                + " Special=" + intToHex(color).substring(0, 2)
-                + " to 2d array, X=" + x + " Y=" + y);
+        openFile.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("Loading bmp file...");
+                FileChooser chooser = new FileChooser();
+                chooser.getExtensionFilters().addAll(
+                        new FileChooser.ExtensionFilter("Bitmap", "*.bmp"),
+                        new FileChooser.ExtensionFilter("All Files", "*.*"));
+                File file = chooser.showOpenDialog(primaryStage);
+                String fileName = file.getPath();
+                if (fileName.toLowerCase().contains(".bmp")) {
+                    System.out.println("TODO: load file from here");
+                } else {
+                    System.err.println("ERROR: Open path is empty");
+                }
+             }
+        });
     }
 }
