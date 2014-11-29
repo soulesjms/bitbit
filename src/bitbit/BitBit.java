@@ -13,7 +13,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -33,6 +32,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.DirectoryChooser;
 
 /**
  *
@@ -53,6 +53,7 @@ public class BitBit extends Application {
     VBox topContainer = new VBox();
 //Menus
     Menu file = new Menu("File");
+    MenuItem openFolder = new MenuItem("Open Folder");
     MenuItem openFile = new MenuItem("Open File");
     MenuItem saveAs = new MenuItem("Save as...");
     MenuItem saveBtn = new MenuItem("Save");
@@ -205,10 +206,11 @@ System.out.println("SetupImageView: " + url);
      public void setupMenus(final Stage primaryStage) {
                 //Create SubMenu File.
         openFile.setAccelerator(KeyCombination.keyCombination("Ctrl+O"));
+        openFolder.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+O"));
         saveAs.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+S"));
         saveBtn.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         exitApp.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
-        file.getItems().addAll(openFile, saveBtn, saveAs, exitApp);
+        file.getItems().addAll(openFile, openFolder, saveBtn, saveAs, exitApp);
 
         saveBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -308,5 +310,18 @@ System.out.println("SetupImageView: " + url);
                 }
              }
         });
+        
+     openFolder.setOnAction(new EventHandler<ActionEvent>() {
+         @Override
+         public void handle(ActionEvent event) {
+                System.out.print("Loading directory... ");
+                DirectoryChooser chooser = new DirectoryChooser();
+                chooser.setTitle("Choose BMP Folder");
+                //File defaultDirectory = new File("c:/");
+                //chooser.setInitialDirectory(defaultDirectory);
+                File selectedDirectory = chooser.showDialog(primaryStage);
+                System.out.println(selectedDirectory);
+         }
+     });
     }
 }
