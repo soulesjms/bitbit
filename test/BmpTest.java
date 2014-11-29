@@ -4,8 +4,8 @@
  * and open the template in the editor.
  */
 import bitbit.BitBit;
-import static bitbit.BitBit.hexToInt;
-import static bitbit.BitBit.intToHex;
+import static bitbit.PicTerm.hexToInt;
+import static bitbit.PicTerm.intToHex;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
