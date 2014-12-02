@@ -75,6 +75,7 @@ public class ScriptureJournalApp extends Application {
     MenuItem exitApp = new MenuItem("Exit");
     Menu edit = new Menu("Edit");
     MenuItem clearAll = new MenuItem("New entry");
+    MenuItem deleteCurEntry = new MenuItem("Delete selected entry");
     Menu topicView = new Menu("All Topics");
     Menu scriptureView = new Menu("All Scriptures");
     Menu help = new Menu("Help");
@@ -182,6 +183,7 @@ public class ScriptureJournalApp extends Application {
     //a sort of destructor
     @Override
     public void stop() {
+        saveJournal();
         System.out.println("Write again tomorrow!");
     }
    
@@ -368,6 +370,18 @@ public class ScriptureJournalApp extends Application {
             System.err.println(inFile + " is not a valid file to load");
         }
     }
+    
+    public void saveJournal() {
+        String fileName = inFile;
+        if (fileName.toLowerCase().contains(".txt")) {
+            saveTxt(j, fileName);
+        } else if (fileName.toLowerCase().contains(".xml")) {
+            saveXml(j, fileName);
+        } else {
+            System.out.println("Not good to save to that type of file");
+        }
+    }
+    
     public void setupMenus(final Stage primaryStage) {
                 //Create SubMenu File.
         openFile.setAccelerator(KeyCombination.keyCombination("Ctrl+O"));
@@ -379,14 +393,7 @@ public class ScriptureJournalApp extends Application {
         saveBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                String fileName = inFile;
-                if (fileName.toLowerCase().contains(".txt")) {
-                    saveTxt(j, fileName);
-                } else if (fileName.toLowerCase().contains(".xml")) {
-                    saveXml(j, fileName);
-                } else {
-                    System.out.println("Not good to save to that type of file");
-                }
+                saveJournal();
             }
         });
         clearAll.setOnAction(new EventHandler<ActionEvent>() {
@@ -401,11 +408,22 @@ public class ScriptureJournalApp extends Application {
                 updateWordCount();
             }
         });
-
+        
+        deleteCurEntry.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("Deleting selected entry...");
+                j.remove(listView.getSelectionModel().getSelectedItem());
+                entriesOList.remove(listView.getSelectionModel().getSelectedItem());
+                scripturesOList.clear();
+                topicsOList.clear();
+            }
+        });
 
         exitApp.setOnAction(new EventHandler<ActionEvent>() {
            @Override
            public void handle(ActionEvent event) {
+               stop();
                System.exit(0);
             }
         });
@@ -434,7 +452,7 @@ public class ScriptureJournalApp extends Application {
          });
     
         //Create SubMenu Edit.
-        edit.getItems().add(clearAll);
+        edit.getItems().addAll(deleteCurEntry, clearAll);
         
         //Create SubMenu Topics and add them all in.
         for (Entry eCurr : j.getEntries()) {

@@ -27,9 +27,17 @@ public class Journal {
     public List<Entry> getEntries() {
         return this.entryList;
     }
-
+    
     public void add(Entry e) {
         entryList.add(e);
+    }
+    
+    public void remove(int index) {
+        entryList.remove(index);
+    }
+    
+    public void remove(Entry e) {
+        entryList.remove(e);
     }
 
     public void display() {
