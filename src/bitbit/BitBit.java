@@ -135,6 +135,7 @@ System.out.println("SetupImageView: " + url);
 
     /**
      * TODO: pass in Image when selected from listView
+     * Loads Image's colorTable into ColorTableView.
      */
     public void setupColorTableView() {
         //TODO: load colorTable from Bitmap or BmpImage class
@@ -161,6 +162,7 @@ System.out.println("SetupImageView: " + url);
                 try {
                     // create a color from the fieldname
                     Color c = Color.web(fieldname.getName());
+//                    final Rectangle s = new Rectangle();
                     // Make a rectangle with that field name's color
                     final Rectangle r = new Rectangle(15, 15, c);
                     final int iTemp = i;
@@ -321,6 +323,13 @@ System.out.println("SetupImageView: " + url);
                 //chooser.setInitialDirectory(defaultDirectory);
                 File selectedDirectory = chooser.showDialog(primaryStage);
                 System.out.println(selectedDirectory);
+              /* try (DirectoryStream<Path> stream =
+                       Files.newDirectoryStream(selectedDirectory, "*.{bmp}")) {
+                   for (Path entry: stream) {
+                       System.out.println(entry.getFileName());
+                   }
+               } catch (IOException x) 
+               */
          }
      });
     }
