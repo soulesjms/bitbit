@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.URL;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -139,6 +140,7 @@ public class FileServices implements Runnable {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
+            
             doc.getDocumentElement().normalize();
 
             NodeList nList = doc.getElementsByTagName("entry");
