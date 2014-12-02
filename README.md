@@ -11,3 +11,6 @@ Bitmap animation utility
 <li>Load all bitmaps from folder</li>
 <li>Write out the edited bitmap(s)</li>
 </ul>
+
+<h4>A guide that simply explains how bitmaps work:</h4>
+http://compsci17.org/CS1107/Guides/XVI32/<a href="http://compsci17.org/CS1107/Guides/XVI32/"></a>
