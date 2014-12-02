@@ -4,6 +4,7 @@
 package scripturejournalapp;
 
 import java.io.File;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -46,7 +47,6 @@ public class ScriptureJournalApp extends Application {
     static String outputTxt;
     //Default input file, xml or txt
     static String inFile;
-
     private Journal j;
     private TextArea entryField;
     private Label dateLbl;
@@ -76,6 +76,7 @@ public class ScriptureJournalApp extends Application {
     Menu edit = new Menu("Edit");
     MenuItem clearAll = new MenuItem("New entry");
     MenuItem deleteCurEntry = new MenuItem("Delete selected entry");
+    MenuItem addTemplate = new MenuItem("Add Template");
     Menu topicView = new Menu("All Topics");
     Menu scriptureView = new Menu("All Scriptures");
     Menu help = new Menu("Help");
@@ -97,10 +98,14 @@ public class ScriptureJournalApp extends Application {
     public static void main(String[] args) {
         ScriptureJournalApp sja = new ScriptureJournalApp();
         if (args.length < 1) {
-            System.out.println("Error: " + args.length
-                    + " args, PLEASE PASS IN FILE TO LOAD, defaults will be loaded this time...");
+            System.out.println("MESSAGE: " + args.length
+                    + " args, defaults will be loaded this time...");
             inFile = PropResources.getPropResources().getDefaultJournalXML();
-            //inFile = FileServices.workDir + PropResources.getPropResources().getDefaultJournalTxt();
+        URL url = ScriptureJournalApp.class.getResource(inFile); 
+        System.out.println("PATIENCE and CALMNESS"+ScriptureJournalApp.class.getResource("/journ.xml"));
+//        inFile = ScriptureJournalApp.class.getResource("/journ.xml");
+//        System.out.println("File= " +url.getFile());
+
         } else if (args.length == 1) {
             inFile = args[0];
         }
@@ -143,8 +148,8 @@ public class ScriptureJournalApp extends Application {
         setupListViews();
         setupLabels();
         setupEntryFields();
-   
-        loadJournal();
+        
+        loadJournal(inFile);
 
         defaultSetupJournal();
         setupBars();
@@ -183,7 +188,7 @@ public class ScriptureJournalApp extends Application {
     //a sort of destructor
     @Override
     public void stop() {
-        saveJournal();
+        saveJournal(inFile);
         System.out.println("Write again tomorrow!");
     }
    
@@ -361,18 +366,17 @@ public class ScriptureJournalApp extends Application {
         entryField.setWrapText(true);
         entryField.setTooltip(new Tooltip("Context of Entry"));
     }
-    public void loadJournal() {
-        if (inFile.contains(".txt")) {
-            j = loadTxt(inFile);
-        } else if (inFile.contains(".xml")) {
-            j = loadXml(inFile);
+    public void loadJournal(String in) {
+        if (in.contains(".txt")) {
+            j = loadTxt(in);
+        } else if (in.contains(".xml")) {
+            j = loadXml(in);
         } else {
-            System.err.println(inFile + " is not a valid file to load");
+            System.err.println(in + " is not a valid file to load");
         }
     }
     
-    public void saveJournal() {
-        String fileName = inFile;
+    public void saveJournal(String fileName) {
         if (fileName.toLowerCase().contains(".txt")) {
             saveTxt(j, fileName);
         } else if (fileName.toLowerCase().contains(".xml")) {
@@ -393,7 +397,7 @@ public class ScriptureJournalApp extends Application {
         saveBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                saveJournal();
+                saveJournal(inFile);
             }
         });
         clearAll.setOnAction(new EventHandler<ActionEvent>() {
@@ -420,10 +424,22 @@ public class ScriptureJournalApp extends Application {
             }
         });
 
+        addTemplate.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("Filling entryField with template text...");
+                entryField.setText(entryField.getText() 
+                                   + "From class:\n\nWord count:\n"
+                                   + "\nReading:\n\nWord count:\n"
+                                   + "\nQuestion:\n\n"
+                                   + "\nPrompting:\n\n");
+            }
+        });
+                
         exitApp.setOnAction(new EventHandler<ActionEvent>() {
            @Override
            public void handle(ActionEvent event) {
-               stop();
+               //note: will not auto-save
                System.exit(0);
             }
         });
@@ -452,7 +468,7 @@ public class ScriptureJournalApp extends Application {
          });
     
         //Create SubMenu Edit.
-        edit.getItems().addAll(deleteCurEntry, clearAll);
+        edit.getItems().addAll(addTemplate, deleteCurEntry, clearAll);
         
         //Create SubMenu Topics and add them all in.
         for (Entry eCurr : j.getEntries()) {
