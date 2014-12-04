@@ -288,8 +288,120 @@ public class Bitmap {
         }
     }
 
+    /**
+     * getter for the ColorTable
+     * @return this bitmap's color table
+     */
     public ColorTable getColorTable() {
         return colorTable;
+    }
+    
+    /**
+     * Exports this bitmap's current data to a Windows-style bitmap file
+     * @param filename 
+     * @throws java.io.IOException 
+     */
+    public void exportBitmap(String filename) throws IOException {
+        DataOutputStream out = new DataOutputStream(new FileOutputStream(filename));
+        writeFileHeader(out);
+        writeBitmapHeader(out);
+        writeColorTable(out);
+        writeImageData(out);
+    }
+
+    /**
+     * Private method to write a bitmap file header
+     * @param out Data output stream
+     */
+    private void writeFileHeader(DataOutputStream out) throws IOException {
+        //Bitmap signature
+        out.writeByte(0x42);
+        out.writeByte(0x4D);
+        //File size
+        writeValLE(out, 4, bfSize);
+        //reserved
+        out.writeInt(0);
+        //offset to pixel data
+        writeValLE(out, 4, bfOffset);
+    }
+
+    /**
+     * Private method to write this bmp's DIB bitmap header to an output stream.
+     * Writes Windows-style
+     * @param out 
+     */
+    private void writeBitmapHeader(DataOutputStream out) throws IOException {
+        writeValLE(out, 4, biSize); //bitmap header size
+        writeValLE(out, 4, biWidth);
+        writeValLE(out, 4, biHeight);
+        writeValLE(out, 2, biPlanes);
+        writeValLE(out, 2, biBitCount); //bits per pixel
+        writeValLE(out, 4, biCompression);
+        writeValLE(out, 4, biSizeImage); //image size
+        writeValLE(out, 4, biXPelsPerMeter);
+        writeValLE(out, 4, biYPelsPerMeter);
+        writeValLE(out, 4, biClrUsed);
+        writeValLE(out, 4, biClrImportant);
+    }
+
+    /**
+     * Private method to write this bitmap's color table
+     * to an output stream
+     * @param out 
+     */
+    private void writeColorTable(DataOutputStream out) throws IOException {
+        for (BmpColor color : colorTable) {
+            writeColor(out, color);
+        }
+    }
+
+    /**
+     * Private method for writing this bmp's image data to an output stream
+     * @param out 
+     */
+    private void writeImageData(DataOutputStream out) throws IOException {
+        int index;
+        int padding = 0;
+        int overage = biWidth % 4;
+        if ( overage != 0 )
+            padding = 4 - overage;
+        for ( int y = biHeight - 1; y >= 0; y-- )
+        {
+            index = y * biWidth;
+            for ( int x = 0; x < biWidth; x++ )
+            {
+                out.writeByte(pix[index++]);
+            }
+            if ( padding != 0 ) {
+                for ( int i = 0; i < padding; i++) {
+                    out.writeByte(0);
+                }
+            }
+        }
+        
+    }
+    
+    /**
+     * A private method for writing little endian quantities to an output stream
+     * @param out
+     * @param len
+     * @param value 
+     */
+    private void writeValLE(DataOutputStream out, int len, int value) throws IOException {
+        for (int x = 0; x < len; x++) {
+            out.writeByte(value >> (x * 8) & 0xFF);
+        }
+    }
+    
+    /**
+     * A private method for writing a Windows-style RGB color to an outputstream
+     * @param out 
+     */
+    private void writeColor(DataOutputStream out, BmpColor color) throws IOException {
+        out.writeByte(color.getBlue());
+        out.writeByte(color.getGreen());
+        out.writeByte(color.getRed());
+        out.writeByte(0);
     }
     
     /**
@@ -330,7 +442,7 @@ public class Bitmap {
         {
             String fileInput;
             if (args.length < 1) {
-               fileInput = "C:/Users/David/Desktop/test.bmp";
+               fileInput = "C:/Users/David/Desktop/test3.bmp";
             }
             else {
                  fileInput = args[0];
@@ -338,10 +450,17 @@ public class Bitmap {
             
             Bitmap im = new Bitmap(fileInput);
             System.out.println("Output:\n" + im);
+            System.out.println();
+            
+            System.out.println("Writing to a file...");
+            im.exportBitmap("C:/Users/David/Desktop/test2.bmp");
+            System.out.println("Success");
         }
         catch ( Exception e )
         {
             System.out.println(e);
         }
     }
+
+    
 }
