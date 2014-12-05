@@ -3,9 +3,11 @@
  */
 package bitbit;
 
+import java.awt.AWTException;
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.collections.FXCollections;
@@ -40,10 +42,13 @@ import javafx.stage.DirectoryChooser;
  */
 public class BitBit extends Application {
 
-    static String defaultFileIn = "resources/fun.bmp";
+    static boolean FIRSTRUNTEST = true;
+    static Bitmap im;
+    static String defaultFileIn = "/resources/tin.bmp";
+    static String curFile = defaultFileIn;
     //TODO: change images to be an array
     final Image images = new Image(defaultFileIn);
-    ImageView pics = new ImageView();
+    ImageView imgView = new ImageView();
     final String website = "http://www.github.com/zvakanaka/bitbit";
 
 //GUI boxes, toolbars, and panes
@@ -59,19 +64,23 @@ public class BitBit extends Application {
     MenuItem saveBtn = new MenuItem("Save");
     MenuItem exitApp = new MenuItem("Quit");
     Menu edit = new Menu("Edit");
+    MenuItem swap = new MenuItem("Swap");
     MenuItem clearAll = new MenuItem("Clear");
     Menu help = new Menu("Help");
     MenuItem visitWebsite = new MenuItem("Visit Website");
     MenuItem showHelp = new MenuItem("Show Help");
 //ListViews
-    ListView<Image> listView = new ListView<>();
-    final ObservableList<Image> thumbsList = FXCollections.observableArrayList();
-    final ListView<String> colorBlocks = new ListView<>();
-    final ObservableList<String> colorsList = FXCollections.observableArrayList(); 
-    final FlowPane flow = new FlowPane();
+    ListView<String> listView = new ListView<>();
+    ObservableList<String> thumbsList = FXCollections.observableArrayList();
+    ListView<String> colorBlocks = new ListView<>();
+    ObservableList<String> colorsList = FXCollections.observableArrayList(); 
+    //TODO: add view for list
+    ObservableList<Integer> swapSpots = FXCollections.observableArrayList(); 
+    FlowPane imgViewBlocks = new FlowPane();
+    FlowPane colorFlow = new FlowPane();
 //Scene
     int sceneWidth = 700;
-    int sceneHeight = 400;
+    int sceneHeight = 450;
     
     public static void main(String[] args){
         
@@ -89,9 +98,14 @@ public class BitBit extends Application {
 
         setupMenus(primaryStage);
         setupFileBoxes(primaryStage);
-        setupListViews(images);
-        setupImageView(defaultFileIn);
-        setupColorTableView();
+        String fileName = defaultFileIn;
+        if (FIRSTRUNTEST) {            
+            fileName = BitBit.class.getResource(fileName).getFile();
+         //   FIRSTRUNTEST = false;
+        }
+        setupListViews(fileName);
+        setupImageView(fileName);
+        setupColorTableView(fileName);
 
         Scene scene = new Scene(root, sceneWidth, sceneHeight);
         
@@ -104,8 +118,8 @@ public class BitBit extends Application {
         //col, row, coltakeup, rowtakeup
         grid.add(mainMenu, 0, 0, 1, 1);
         grid.add(listView, 0, 1, 1, 1);
-        grid.add(pics,     5, 1, 1, 1);
-        grid.add(flow,     6, 1, 1, 1);
+        grid.add(imgViewBlocks,  5, 1, 1, 1);
+        grid.add(colorFlow,     6, 1, 1, 1);
 
         primaryStage.setTitle("BitBit");
         primaryStage.setScene(scene);
@@ -119,52 +133,82 @@ public class BitBit extends Application {
     }
     
     public void setupImageView(String url) {
-        //TODO: make images same as images variable in constructor
-        //PROBLEM: for some reason, smooth set to false does NOT work for bmp
-        
-        //                                                  preserve ratio, smooth 
-        //Image images = new Image(url, sceneWidth/2, sceneWidth/2/2, true, false);
-        //Image images = new Image("file:/home/adam/Desktop/P3183616.JPG");
-        Image image = new Image(url);
-System.out.println("SetupImageView: " + url);
-        pics.setImage(image);
-        pics.setFitWidth(400);
-        pics.setPreserveRatio(true);
-        pics.setSmooth(false);
+
+        System.out.println("Setting imageView for: " + url);
+        try {
+            imgViewBlocks.getChildren().removeAll(imgViewBlocks.getChildren());
+           
+            Bitmap im = new Bitmap(url);
+            //System.out.println("Output:\n" + im);
+            
+            //spacing between pixels
+            int gap = 0;
+            //imgViewBlocks = new FlowPane();
+            imgViewBlocks.setVgap(gap);
+            imgViewBlocks.setHgap(gap);
+            int wrapLength = 400;
+            imgViewBlocks.setPrefWrapLength(wrapLength+gap*(im.biWidth+1));
+            //track spot in loop
+            int i = 0;
+            for (int perPix : im.pix) {
+                System.out.print(perPix);
+                if ((i+1)%im.biWidth == 0) {
+                    System.out.println();
+                }
+                try {
+                    //traverse colorTable of image and dereferrence proper colors
+                    Color co = Color.rgb(im.getColorTable().getColor(perPix).getRed()
+                        ,                im.getColorTable().getColor(perPix).getGreen()
+                        ,                im.getColorTable().getColor(perPix).getBlue());
+                    final Rectangle r = new Rectangle(wrapLength/im.biWidth, wrapLength/im.biWidth, co);
+                    final int iTemp = i;
+                    r.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                        
+                        @Override
+                        public void handle(MouseEvent event) {
+                            //grab selected item only
+                            String selectedItem = r.toString().substring(58, 64);
+                            System.out.println("Selecting [" + perPix + "] " 
+                                       + selectedItem + " [" + iTemp + "] in pixel array");
+                            swapSpots.add(perPix);
+                        }
+                    });
+                    // Configure the rectangle
+                    // Add it to the imgViewBlocks container
+                    imgViewBlocks.getChildren().add(r);
+                    i++;
+                } catch (IllegalArgumentException e) {
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Setup Image View Error\nImage: " + url);
+        }
     }
 
     /**
      * TODO: pass in Image when selected from listView
      * Loads Image's colorTable into ColorTableView.
      */
-    public void setupColorTableView() {
-        //TODO: load colorTable from Bitmap or BmpImage class
-        //THE FOLLOWING CODE IS BORROWED FROM http://www.asgteach.com/blog/?p=327
-        // Put all the color rectangles in a flow container
-
-        flow.setVgap(2);
-        flow.setHgap(2);
-        flow.setPrefWrapLength(150);
-        // Get the declared fields for the Color class
-        Field[] colorFields = Color.class.getDeclaredFields();
-        //track spot in loop
-        int i = 0;
-        for (Field fieldname : colorFields) {
-            // get the field's modifiers so we can tell
-            // if it's public and static
-            int mods = fieldname.getModifiers();
-
-            //TODO: replace the following loop with colorTable of selected image
-            // Only use the field if it's
-            // public, static, and NOT 'TRANSPARENT'
-            if (Modifier.isPublic(mods) && Modifier.isStatic(mods)
-                    && !(fieldname.getName().equals("TRANSPARENT"))) {
+    public void setupColorTableView(String fileName) {
+        try {
+            //TODO: load colorTable from Bitmap or BmpImage class
+            // Put color table rectangles in a flow container
+            colorFlow.getChildren().removeAll(colorFlow.getChildren());
+            System.out.println("Loading ColorTableView for: " + fileName);
+            im = new Bitmap(fileName);
+            colorFlow.setVgap(2);
+            colorFlow.setHgap(2);
+            colorFlow.setPrefWrapLength(150);
+            //track spot in loop
+            int i = 0;
+            for (int count = 0; count < im.getColorTable().getNumColors(); count++) {
                 try {
-                    // create a color from the fieldname
-                    Color c = Color.web(fieldname.getName());
-//                    final Rectangle s = new Rectangle();
-                    // Make a rectangle with that field name's color
-                    final Rectangle r = new Rectangle(15, 15, c);
+                    Color co;
+                    co = Color.rgb(im.getColorTable().getColor(count).getRed(),
+                            im.getColorTable().getColor(count).getGreen(),
+                            im.getColorTable().getColor(count).getBlue());
+
+                    final Rectangle r = new Rectangle(15, 15, co);
                     final int iTemp = i;
                     r.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
@@ -173,40 +217,44 @@ System.out.println("SetupImageView: " + url);
                             //TODO: grab selected item only
                             String selectedItem = r.toString().substring(56, 62);
                             System.out.println("Selecting [" + iTemp + "] " + selectedItem);
+                            swapSpots.add(iTemp);
                         }
                     });
-                    // Configure the rectangle
-                    // Add it to the flow container
-                    flow.getChildren().add(r);
+                    // add rectangle to flow container
+                    colorFlow.getChildren().add(r);
                     i++;
                 } catch (IllegalArgumentException e) {
-                    // just ignore it if for some reason we can't make
-                    // a color
+                    System.err.println("Color making failed");
                 }
             }
+        } catch (AWTException ex) {
+            Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     //TODO: change image to array or list
-    public void setupListViews(Image image) {
+    public void setupListViews(final String fileName) {
         //TODO: print image instead of String in listView
-        thumbsList.add(image);
+//        Image image = new Image("file:" + fileName);
+        thumbsList.add(fileName);
         listView.setItems(thumbsList);
         listView.setPrefWidth(150);
         listView.setPrefHeight(sceneHeight - 30);
         listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            
+            //TODO: change list to hold bitmaps
             @Override
             public void handle(MouseEvent event) {
-                Image selectedImage = listView.getSelectionModel().getSelectedItem();
+                String selectedImage = listView.getSelectionModel().getSelectedItem();
                 System.out.println("Loading " + selectedImage + " in ImageView");
-                pics.setImage(selectedImage);
+
+                setupImageView(selectedImage);
+                setupColorTableView(selectedImage);
             }
         });
-}
+    }
     
-     public void setupMenus(final Stage primaryStage) {
-                //Create SubMenu File.
+    public void setupMenus(final Stage primaryStage) {
+        //Create SubMenu File.
         openFile.setAccelerator(KeyCombination.keyCombination("Ctrl+O"));
         openFolder.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+O"));
         saveAs.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+S"));
@@ -217,14 +265,38 @@ System.out.println("SetupImageView: " + url);
         saveBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                //TODO: save file here
+                    System.out.println("Saving");
+                    String fileName = "/home/adam/Desktop/exported.bmp";
+                    saveBMP(fileName);
             }
         });
+        swap.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                int i = swapSpots.size();
+                if (i > 1) {
+                System.out.println("Swapping " + swapSpots.get(i-2) 
+                                 + " and "     + swapSpots.get(i-1));
+                im.getColorTable().swapColors(swapSpots.get(i-2)
+                                            , swapSpots.get(i-1));
+                //TODO:refresh colorTableView to show change
+                }
+                else {
+                    System.err.println("ERROR: Select 2 colors to swap");
+                }
+            }
+        });
+
         clearAll.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 //TODO: clear imageView here
-                System.out.println("Put Clear Code Here");
+                System.out.println("Clear Code");
+                imgViewBlocks.getChildren().removeAll(imgViewBlocks.getChildren());
+                colorFlow.getChildren().removeAll(colorFlow.getChildren());
+                //Want to clear list on left side as well?
+                //thumbsList = FXCollections.observableArrayList();
+                //listView.setItems(thumbsList);
             }
         });
 
@@ -260,8 +332,7 @@ System.out.println("SetupImageView: " + url);
          });
     
         //Create SubMenu Edit.
-
-        edit.getItems().add(clearAll);
+        edit.getItems().addAll(swap, clearAll);
        
         //Create SubMenu Help.
         help.getItems().addAll(visitWebsite, showHelp);
@@ -279,7 +350,8 @@ System.out.println("SetupImageView: " + url);
                 if (file != null) {
                     String fileName = file.getPath();
                     if (fileName.toLowerCase().contains(".bmp")) {
-                        System.out.println("TODO: save file to here");
+                        System.out.println("Save file to here");
+                        saveBMP(fileName);
                     } 
                     else {
                         System.out.println("Not good to save to that type of file");
@@ -303,9 +375,11 @@ System.out.println("SetupImageView: " + url);
                 String fileName = file.getPath();
                 if (fileName.toLowerCase().contains(".bmp")) {
                     //Load image
+                    curFile = fileName;
                     System.out.println(fileName);
-                    setupListViews(new Image("file:" + fileName));
-                    setupImageView("file:" + fileName);
+                    setupListViews(fileName);
+                    setupImageView(fileName);
+                    setupColorTableView(fileName);
                     
                 } else {
                     System.err.println("ERROR: File is not a bmp");
@@ -332,5 +406,28 @@ System.out.println("SetupImageView: " + url);
                */
          }
      });
+    }
+    public void saveBMP(String fileName) {
+        try {
+            im.exportBitmap(fileName);
+        } catch (IOException ex) {
+            Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    //TODO: May be deleted WHEN the current setupImageView is properly working
+    public void OLDsetupImageView(String url) {
+        //TODO: make images same as images variable in constructor
+        //PROBLEM: for some reason, smooth set to false does NOT work for bmp
+        
+        //                                                  preserve ratio, smooth 
+        //Image images = new Image(url, sceneWidth/2, sceneWidth/2/2, true, false);
+        //Image images = new Image("file:/home/adam/Desktop/P3183616.JPG");
+        Image image = new Image(url);
+        System.out.println("SetupImageView: " + url);
+        imgView.setImage(image);
+        imgView.setFitWidth(400);
+        imgView.setPreserveRatio(true);
+        imgView.setSmooth(false);
     }
 }
