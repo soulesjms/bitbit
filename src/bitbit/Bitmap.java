@@ -4,6 +4,9 @@ import java.io.*;
 import java.net.*;
 import java.awt.*;
 import java.awt.image.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -405,6 +408,40 @@ public class Bitmap {
     }
     
     /**
+     * Replaces this bitmap's color table with another table,
+     * changing the pixel data to match the new color table.
+     * Precondition:
+     *   The colors in the new table should be exactly the same as the
+     *   colors in the old table, just in a different order.
+     * @param newTable 
+     * @throws AWTException if the colors in the two tables don't match
+     */
+    public void replaceColorTable(ColorTable newTable) throws AWTException {
+        boolean[] changedPixels = new boolean[pix.length];
+        for (BmpColor newColor : newTable) {
+            int indexInNewTable = newTable.getIndex(newColor);
+            int indexInThisTable = colorTable.getIndex(newColor);
+            if (indexInThisTable != -1) {
+                if (indexInThisTable != indexInNewTable) {
+                    for (int i = 0; i < pix.length; i++) {
+                        if (!changedPixels[i] && pix[i] == indexInThisTable) {
+                            pix[i] = indexInNewTable;
+                            System.out.println("Swapping pixel " + i + "(" + changedPixels[i] + "): " + 
+                                    indexInThisTable + " to " + indexInNewTable);
+                            changedPixels[i] = true;
+                        }
+                    }
+                }
+            }
+            else {
+                throw new AWTException("Colors in new table do not match the old");
+            }
+        }
+        
+        colorTable = newTable;
+    }
+    
+    /**
      * Describe the image as a string
      * @return string representation of image
      */
@@ -431,6 +468,14 @@ public class Bitmap {
         }
         
         buf.append("Color Table" + "\n" + colorTable.toString() + "\n");
+        buf.append("Pixel data:\n");
+        for (int y = 0; y < biHeight; y++) {
+            int index = y * biWidth;
+            for (int x = 0; x < biWidth; x++) {
+                buf.append(pix[index++] + " ");
+            }
+            buf.append("\n");
+        }
         
         return buf.toString();
         
@@ -442,14 +487,25 @@ public class Bitmap {
         {
             String fileInput;
             if (args.length < 1) {
-               fileInput = "C:/Users/David/Desktop/test3.bmp";
+               fileInput = "C:/Users/David/Desktop/test.bmp";
             }
             else {
                  fileInput = args[0];
             }
             
             Bitmap im = new Bitmap(fileInput);
-            System.out.println("Output:\n" + im);
+            System.out.println("Before swap:\n" + im);
+            System.out.println();
+            
+            System.out.println("Swapping colors");
+            ColorTable clrTable = new ColorTable();
+            for (BmpColor clr : im.getColorTable()) {
+                clrTable.addColor(clr);
+            }
+            clrTable.swapColors(0, 1);
+            im.replaceColorTable(clrTable);
+            
+            System.out.println("After swap:\n" + im);
             System.out.println();
             
             System.out.println("Writing to a file...");

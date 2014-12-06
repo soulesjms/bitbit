@@ -25,6 +25,15 @@ public class ColorTable implements Iterable<BmpColor> {
         return colors.get(index);
     }
     
+    /**
+     * 
+     * @param color
+     * @return index of the given color, or -1 if not found.
+     */
+    public int getIndex(BmpColor color) {
+        return colors.indexOf(color);
+    }
+    
     public int getNumColors() {
         return colors.size();
     }

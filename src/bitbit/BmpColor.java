@@ -50,4 +50,8 @@ public class BmpColor {
         return red + " " + green + " " + blue;
     }
     
+    public boolean equals(BmpColor clr) {
+        return this.getRed() == clr.getRed() && this.getGreen() == clr.getGreen()
+                && this.getBlue() == clr.getBlue();
+    }
 }
