@@ -5,6 +5,7 @@
  */
 package bitbit;
 
+import java.awt.AWTException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,12 +18,33 @@ public class ColorTable implements Iterable<BmpColor> {
     
     private List<BmpColor> colors = new ArrayList<>();
     
-    public void addColor(BmpColor color) {
-        colors.add(color);
+    public final int MAX_COLORS = 256;
+    
+    /**
+     * Adds a color to the color table. Will not add duplicates.
+     * @param color 
+     * @throws java.awt.AWTException - if colortable is full.
+     */
+    public void addColor(BmpColor color) throws AWTException {
+        if (colors.size() >= MAX_COLORS) {
+            throw new AWTException("Maximum colors exceeded");
+        }
+        if (!colors.contains(color)) {
+            colors.add(color);
+        }
     }
     
     public BmpColor getColor(int index) {
         return colors.get(index);
+    }
+    
+    /**
+     * 
+     * @param color
+     * @return index of the given color, or -1 if not found.
+     */
+    public int getIndex(BmpColor color) {
+        return colors.indexOf(color);
     }
     
     public int getNumColors() {
@@ -53,9 +75,14 @@ public class ColorTable implements Iterable<BmpColor> {
     
     public static void main(String[] args) {
         ColorTable ct = new ColorTable();
-        ct.addColor(new BmpColor(0, 0, 0));
-        ct.addColor(new BmpColor(3, 3, 3));
-        ct.addColor(new BmpColor(6, 6, 6));
+        
+        try {
+            ct.addColor(new BmpColor(0, 0, 0));
+            ct.addColor(new BmpColor(3, 3, 3));
+            ct.addColor(new BmpColor(6, 6, 6));
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
         
         System.out.println("ColorTable:");
         System.out.println(ct);

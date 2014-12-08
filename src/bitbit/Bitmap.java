@@ -4,6 +4,9 @@ import java.io.*;
 import java.net.*;
 import java.awt.*;
 import java.awt.image.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -99,7 +102,7 @@ public class Bitmap {
      * @param is contains the input stream
      * @param numColors contains the biClrUsed (for Windows) or zero
      */
-    private void extractColorMap(DataInputStream is, int numColors)
+        private void extractColorMap(DataInputStream is, int numColors)
         throws IOException, AWTException
     {
         int blues[], reds[], greens[];
@@ -405,6 +408,47 @@ public class Bitmap {
     }
     
     /**
+     * Replaces this bitmap's color table with another table,
+     * changing the pixel data to match the new color table.
+     * Precondition:
+     *   The new table must contain at least the colors that are currently
+     *   contained in this bitmap's color table
+     * @param newTable 
+     * @throws AWTException if the new table doesn't contain all the colors
+     *                      contained in the current table
+     */
+    public void replaceColorTable(ColorTable newTable) throws AWTException {
+        boolean[] changedPixels = new boolean[pix.length];
+        for (BmpColor color : colorTable) {
+            int indexInNewTable = newTable.getIndex(color);
+            int indexInThisTable = colorTable.getIndex(color);
+            if (indexInNewTable != -1) {
+                if (indexInThisTable != indexInNewTable) {
+                    for (int i = 0; i < pix.length; i++) {
+                        if (!changedPixels[i] && pix[i] == indexInThisTable) {
+                            pix[i] = indexInNewTable;
+//                            System.out.println("Swapping pixel " + i + "(" + changedPixels[i] + "): " + 
+//                                    indexInThisTable + " to " + indexInNewTable);
+                            changedPixels[i] = true;
+                        }
+                    }
+                }
+            }
+            else {
+                throw new AWTException("Colors in new table do not match the old");
+            }
+        }
+        
+        if (colorTable.getNumColors() != newTable.getNumColors()) {
+            int diffNumColors = newTable.getNumColors() - colorTable.getNumColors();
+            bfSize += diffNumColors * 4;
+            bfOffset += diffNumColors * 4;
+            biClrUsed += diffNumColors;
+        }
+            colorTable = newTable;
+    }
+    
+    /**
      * Describe the image as a string
      * @return string representation of image
      */
@@ -431,6 +475,14 @@ public class Bitmap {
         }
         
         buf.append("Color Table" + "\n" + colorTable.toString() + "\n");
+        buf.append("Pixel data:\n");
+        for (int y = 0; y < biHeight; y++) {
+            int index = y * biWidth;
+            for (int x = 0; x < biWidth; x++) {
+                buf.append(pix[index++] + " ");
+            }
+            buf.append("\n");
+        }
         
         return buf.toString();
         
@@ -450,7 +502,19 @@ public class Bitmap {
             }
             fileInput = "/home/adam/Desktop/test2.bmp";
             Bitmap im = new Bitmap(fileInput);
-            System.out.println("Output:\n" + im);
+            System.out.println("Before swap:\n" + im);
+            System.out.println();
+            
+            System.out.println("Swapping colors");
+            ColorTable clrTable = new ColorTable();
+            for (BmpColor clr : im.getColorTable()) {
+                clrTable.addColor(clr);
+            }
+            clrTable.swapColors(0, 1);
+            clrTable.addColor(new BmpColor(0,0,0));
+            im.replaceColorTable(clrTable);
+            
+            System.out.println("After swap:\n" + im);
             System.out.println();
             
             System.out.println("Writing to a file...");
