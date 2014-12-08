@@ -442,18 +442,19 @@ public class Bitmap {
         {
             String fileInput;
             if (args.length < 1) {
-               fileInput = "C:/Users/David/Desktop/test3.bmp";
+                URL url = PicTerm.class.getResource("/resources/fun.bmp"); 
+                fileInput = url.getFile();
             }
             else {
                  fileInput = args[0];
             }
-            
+            fileInput = "/home/adam/Desktop/test2.bmp";
             Bitmap im = new Bitmap(fileInput);
             System.out.println("Output:\n" + im);
             System.out.println();
             
             System.out.println("Writing to a file...");
-            im.exportBitmap("C:/Users/David/Desktop/test2.bmp");
+            im.exportBitmap("/home/adam/Desktop/test2.bmp");
             System.out.println("Success");
         }
         catch ( Exception e )
