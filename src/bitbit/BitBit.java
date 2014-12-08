@@ -146,14 +146,18 @@ public class BitBit extends Application {
             //imgViewBlocks = new FlowPane();
             imgViewBlocks.setVgap(gap);
             imgViewBlocks.setHgap(gap);
-            int wrapLength = 400;
+            int dWidth = 400;
+            int wrapLength = 400;//im.biWidth;
+            if (wrapLength > dWidth) {
+                wrapLength /= 2;
+            }
             imgViewBlocks.setPrefWrapLength(wrapLength+gap*(im.biWidth+1));
             //track spot in loop
             int i = 0;
             for (int perPix : im.pix) {
-                System.out.print(perPix);
+                //System.out.print(perPix);
                 if ((i+1)%im.biWidth == 0) {
-                    System.out.println();
+                    //System.out.println();
                 }
                 try {
                     //traverse colorTable of image and dereferrence proper colors
