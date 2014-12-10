@@ -44,10 +44,10 @@ public class BitBit extends Application {
 
     static boolean FIRSTRUNTEST = true;
     static Bitmap im;
-    static String defaultFileIn = "/resources/tin.bmp";
+    static String defaultFileIn = "/home/adam/Desktop/Jesus.bmp";
     static String curFile = defaultFileIn;
     //TODO: change images to be an array
-    final Image images = new Image(defaultFileIn);
+    //final Image images = new Image(defaultFileIn);
     ImageView imgView = new ImageView();
     final String website = "http://www.github.com/zvakanaka/bitbit";
 
@@ -86,7 +86,7 @@ public class BitBit extends Application {
         
         //TODO: replace fileIn with properties file val OR openFile box
         if (args.length != 0) {
-            defaultFileIn = "file:" + args[0];
+            defaultFileIn = args[0];
         }
         //Launch javafx GUI!
         launch(args);
@@ -99,10 +99,13 @@ public class BitBit extends Application {
         setupMenus(primaryStage);
         setupFileBoxes(primaryStage);
         String fileName = defaultFileIn;
-        if (FIRSTRUNTEST) {            
-            fileName = BitBit.class.getResource(fileName).getFile();
-         //   FIRSTRUNTEST = false;
-        }
+        
+//        if (FIRSTRUNTEST) {            
+//            fileName = BitBit.class.getResource(fileName).getFile();
+//         //   FIRSTRUNTEST = false;
+//        }
+//        
+        fileName = defaultFileIn;
         setupListViews(fileName);
         setupImageView(fileName);
         setupColorTableView(fileName);
