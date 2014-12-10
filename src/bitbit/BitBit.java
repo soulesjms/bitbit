@@ -44,10 +44,10 @@ public class BitBit extends Application {
 
     static boolean FIRSTRUNTEST = true;
     static Bitmap im;
-    static String defaultFileIn = "/resources/tin.bmp";
+    static String defaultFileIn = "C:/Users/David/Desktop/test.bmp";
     static String curFile = defaultFileIn;
     //TODO: change images to be an array
-    final Image images = new Image(defaultFileIn);
+    //final Image images = new Image(defaultFileIn);
     ImageView imgView = new ImageView();
     final String website = "http://www.github.com/zvakanaka/bitbit";
 
@@ -100,9 +100,10 @@ public class BitBit extends Application {
         setupFileBoxes(primaryStage);
         String fileName = defaultFileIn;
         if (FIRSTRUNTEST) {            
-            fileName = BitBit.class.getResource(fileName).getFile();
+            //fileName = BitBit.class.getResource(fileName).getFile();
          //   FIRSTRUNTEST = false;
         }
+        fileName = defaultFileIn;
         setupListViews(fileName);
         setupImageView(fileName);
         setupColorTableView(fileName);

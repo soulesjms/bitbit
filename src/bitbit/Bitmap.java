@@ -280,10 +280,12 @@ public class Bitmap {
         {
         case 1:
             throw new AWTException("Unhandled bits/pixel: " + biBitCount);
-        case 4:  extract4BitData(is); 
-        System.out.println("8-bit Image"); break;
-        case 8:  extract8BitData(is); 
-        System.out.println("8-bit Image"); break;
+        case 4:
+            extract4BitData(is); 
+            break;
+        case 8:  
+            extract8BitData(is); 
+            break;
         case 24:
             throw new AWTException("24-bit is Unhandled bits/pixel: " + biBitCount);
         default:
