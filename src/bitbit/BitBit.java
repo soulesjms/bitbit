@@ -6,6 +6,8 @@ package bitbit;
 import java.awt.AWTException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -99,12 +101,7 @@ public class BitBit extends Application {
         setupMenus(primaryStage);
         setupFileBoxes(primaryStage);
         String fileName = defaultFileIn;
-        
-//        if (FIRSTRUNTEST) {            
-//            fileName = BitBit.class.getResource(fileName).getFile();
-//         //   FIRSTRUNTEST = false;
-//        }
-//        
+
         fileName = defaultFileIn;
         setupListViews(fileName);
         setupImageView(fileName);
@@ -135,6 +132,7 @@ public class BitBit extends Application {
         System.out.println("Bye");
     }
     
+    //TODO: find speedier alternative, this is slower than anything
     public void setupImageView(String url) {
 
         System.out.println("Setting imageView for: " + url);
@@ -149,12 +147,16 @@ public class BitBit extends Application {
             //imgViewBlocks = new FlowPane();
             imgViewBlocks.setVgap(gap);
             imgViewBlocks.setHgap(gap);
-            int dWidth = 400;
-            int wrapLength = 400;//im.biWidth;
-            if (wrapLength > dWidth) {
-                wrapLength /= 2;
+            //displayWidth
+            int dWidth = im.biWidth;
+            int wrapLength = 400;
+            
+            while (dWidth < (wrapLength-im.biWidth)) {
+                dWidth += im.biWidth;
             }
-            imgViewBlocks.setPrefWrapLength(wrapLength+gap*(im.biWidth+1));
+            System.out.println("Display Width " + dWidth);
+            imgViewBlocks.setPrefWrapLength(dWidth+gap*(im.biWidth+1));
+            
             //track spot in loop
             int i = 0;
             for (int perPix : im.pix) {
@@ -167,14 +169,21 @@ public class BitBit extends Application {
                     Color co = Color.rgb(im.getColorTable().getColor(perPix).getRed()
                         ,                im.getColorTable().getColor(perPix).getGreen()
                         ,                im.getColorTable().getColor(perPix).getBlue());
-                    final Rectangle r = new Rectangle(wrapLength/im.biWidth, wrapLength/im.biWidth, co);
+                    final Rectangle r = new Rectangle(dWidth/im.biWidth, dWidth/im.biWidth, co);                    
                     final int iTemp = i;
+                    //grab selected rectangle only and print its color
                     r.setOnMouseClicked(new EventHandler<MouseEvent>() {
                         
                         @Override
                         public void handle(MouseEvent event) {
-                            //grab selected item only
-                            String selectedItem = r.toString().substring(58, 64);
+                            
+                            //To get color from selected rectangle
+                            String colorString = "ERROR CONVERTING COLOR TO STRING";
+                            if (r.toString().contains("fill=0x")) {
+                                colorString = r.toString().split("fill=0x")[1];
+                            }
+                            
+                            String selectedItem = colorString.substring(0, 6);
                             System.out.println("Selecting [" + perPix + "] " 
                                        + selectedItem + " [" + iTemp + "] in pixel array");
                             swapSpots.add(perPix);
@@ -376,18 +385,16 @@ public class BitBit extends Application {
                 System.out.print("Loading bmp file... ");
                 FileChooser chooser = new FileChooser();
                 chooser.getExtensionFilters().addAll(
-                        new FileChooser.ExtensionFilter("Bitmap", "*.bmp"),
-                        new FileChooser.ExtensionFilter("All Files", "*.*"));
+                    new FileChooser.ExtensionFilter("Bitmap", "*.bmp"),
+                    new FileChooser.ExtensionFilter("All Files", "*.*"));
                 File file = chooser.showOpenDialog(primaryStage);
                 String fileName = file.getPath();
                 if (fileName.toLowerCase().contains(".bmp")) {
-                    //Load image
                     curFile = fileName;
                     System.out.println(fileName);
                     setupListViews(fileName);
                     setupImageView(fileName);
-                    setupColorTableView(fileName);
-                    
+                    setupColorTableView(fileName);   
                 } else {
                     System.err.println("ERROR: File is not a bmp");
                 }
@@ -400,17 +407,27 @@ public class BitBit extends Application {
                 System.out.print("Loading directory... ");
                 DirectoryChooser chooser = new DirectoryChooser();
                 chooser.setTitle("Choose BMP Folder");
-                //File defaultDirectory = new File("c:/");
-                //chooser.setInitialDirectory(defaultDirectory);
                 File selectedDirectory = chooser.showDialog(primaryStage);
+                System.out.println("filepath:");
                 System.out.println(selectedDirectory);
-              /* try (DirectoryStream<Path> stream =
-                       Files.newDirectoryStream(selectedDirectory, "*.{bmp}")) {
-                   for (Path entry: stream) {
-                       System.out.println(entry.getFileName());
-                   }
-               } catch (IOException x) 
-               */
+             try {
+                 System.out.println("Bmp files found: ");
+                 Files.walk(Paths.get(selectedDirectory.getAbsolutePath())).forEach(filePath -> {
+                     if (Files.isRegularFile(filePath)) {
+                         if (filePath.toString().endsWith(".bmp")){                             
+                             System.out.println(filePath.toString());
+                             curFile = filePath.toString();
+                             setupListViews(filePath.toString());
+                             setupImageView(filePath.toString());
+                             setupColorTableView(filePath.toString());
+                         } else {
+                             System.err.println("ERROR: Folder error");
+                         }
+                     }
+                 });
+             } catch (IOException ex) {
+                 Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+             }
          }
      });
     }
