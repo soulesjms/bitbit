@@ -407,7 +407,8 @@ public class BmpImage
     }
 
     /**
-     * A public test routine (you must pass the filename as the 1st arg)
+     * A public test routine (you may pass the filename as the 1st arg)
+     * @param args
      */
     public static void main( String args[] )
     {
@@ -415,7 +416,8 @@ public class BmpImage
         {
             String fileInput;
             if (args.length < 1) {
-               fileInput = "/home/adam/Desktop/fun.bmp";
+                URL url = PicTerm.class.getResource("/resources/fun.bmp"); 
+               fileInput = url.getFile();
             }
             else {
                  fileInput = args[0];
@@ -426,6 +428,9 @@ public class BmpImage
             BmpImage im = new BmpImage(fileInput);
             ImageProducer img = im.extractImage(is);
             System.out.println("Output:\n" + im);
+            for (int perPix : im.pix) {
+                System.out.println(perPix);
+            }
         }
         catch ( Exception e )
         {
