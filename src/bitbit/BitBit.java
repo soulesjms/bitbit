@@ -46,7 +46,7 @@ public class BitBit extends Application {
 
     static boolean FIRSTRUNTEST = true;
     static Bitmap im;
-    static String defaultFileIn = "/home/adam/Desktop/Jesus.bmp";
+    static String defaultFileIn = "/home/adam/Documents/java/NetBeansProjects/bitbit/src/resources/fun.bmp";
     static String curFile = defaultFileIn;
     //TODO: change images to be an array
     //final Image images = new Image(defaultFileIn);
@@ -214,7 +214,7 @@ public class BitBit extends Application {
             im = new Bitmap(fileName);
             colorFlow.setVgap(2);
             colorFlow.setHgap(2);
-            colorFlow.setPrefWrapLength(150);
+            colorFlow.setPrefWrapLength(400-imgViewBlocks.getPrefWrapLength()+150);
             //track spot in loop
             int i = 0;
             for (int count = 0; count < im.getColorTable().getNumColors(); count++) {
