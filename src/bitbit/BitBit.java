@@ -17,6 +17,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -63,14 +65,17 @@ public class BitBit extends Application {
     MenuItem openFolder = new MenuItem("Open Folder");
     MenuItem openFile = new MenuItem("Open File");
     MenuItem saveAs = new MenuItem("Save as...");
-    MenuItem saveBtn = new MenuItem("Save");
+    MenuItem saveMenuBtn = new MenuItem("Save");
     MenuItem exitApp = new MenuItem("Quit");
     Menu edit = new Menu("Edit");
-    MenuItem swap = new MenuItem("Swap");
+    MenuItem swapMenu = new MenuItem("Swap");
     MenuItem clearAll = new MenuItem("Clear");
     Menu help = new Menu("Help");
     MenuItem visitWebsite = new MenuItem("Visit Website");
     MenuItem showHelp = new MenuItem("Show Help");
+//Buttons
+    Button swapBtn = new Button("Swap");
+    Label swapLbl = new Label("swappoing 1 and 2");
 //ListViews
     ListView<String> listView = new ListView<>();
     ObservableList<String> thumbsList = FXCollections.observableArrayList();
@@ -100,6 +105,7 @@ public class BitBit extends Application {
 
         setupMenus(primaryStage);
         setupFileBoxes(primaryStage);
+        setupButtons();
         String fileName = defaultFileIn;
 
         fileName = defaultFileIn;
@@ -110,16 +116,17 @@ public class BitBit extends Application {
         Scene scene = new Scene(root, sceneWidth, sceneHeight);
         
         //Add the ToolBar and Main Menu to the VBox
-        topContainer.getChildren().add(mainMenu);
-        topContainer.getChildren().add(toolBar);
+        topContainer.getChildren().addAll(mainMenu, toolBar);
 
         root.setTop(grid);
         
         //col, row, coltakeup, rowtakeup
-        grid.add(mainMenu, 0, 0, 1, 1);
-        grid.add(listView, 0, 1, 1, 1);
-        grid.add(imgViewBlocks,  5, 1, 1, 1);
-        grid.add(colorFlow,     6, 1, 1, 1);
+        grid.add(mainMenu,      0, 0, 7, 1);
+        grid.add(listView,      0, 1, 1, 1);
+        grid.add(imgViewBlocks, 1, 1, 1, 1);
+        grid.add(swapBtn,       2, 0, 1, 1);
+//        grid.add(swapLbl,       2, 1, 1, 1);
+        grid.add(colorFlow,     2, 1, 1, 1);
 
         primaryStage.setTitle("BitBit");
         primaryStage.setScene(scene);
@@ -204,6 +211,7 @@ public class BitBit extends Application {
     /**
      * TODO: pass in Image when selected from listView
      * Loads Image's colorTable into ColorTableView.
+     * @param fileName
      */
     public void setupColorTableView(String fileName) {
         try {
@@ -215,6 +223,7 @@ public class BitBit extends Application {
             colorFlow.setVgap(2);
             colorFlow.setHgap(2);
             colorFlow.setPrefWrapLength(400-imgViewBlocks.getPrefWrapLength()+150);
+            
             //track spot in loop
             int i = 0;
             for (int count = 0; count < im.getColorTable().getNumColors(); count++) {
@@ -247,7 +256,17 @@ public class BitBit extends Application {
             Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    public void setupButtons() {
+              swapBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
+                        @Override
+                        public void handle(MouseEvent event) {
+                            //TODO: swap last selected!
+                            System.out.println("SWAP BTN");
+                            swap(swapSpots);
+                        }
+                    });
+    }
     //TODO: change image to array or list
     public void setupListViews(final String fileName) {
         //TODO: print image instead of String in listView
@@ -274,11 +293,11 @@ public class BitBit extends Application {
         openFile.setAccelerator(KeyCombination.keyCombination("Ctrl+O"));
         openFolder.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+O"));
         saveAs.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+S"));
-        saveBtn.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
+        saveMenuBtn.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         exitApp.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
-        file.getItems().addAll(openFile, openFolder, saveBtn, saveAs, exitApp);
+        file.getItems().addAll(openFile, openFolder, saveMenuBtn, saveAs, exitApp);
 
-        saveBtn.setOnAction(new EventHandler<ActionEvent>() {
+        saveMenuBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                     System.out.println("Saving");
@@ -286,20 +305,10 @@ public class BitBit extends Application {
                     saveBMP(fileName);
             }
         });
-        swap.setOnAction(new EventHandler<ActionEvent>() {
+        swapMenu.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                int i = swapSpots.size();
-                if (i > 1) {
-                System.out.println("Swapping " + swapSpots.get(i-2) 
-                                 + " and "     + swapSpots.get(i-1));
-                im.getColorTable().swapColors(swapSpots.get(i-2)
-                                            , swapSpots.get(i-1));
-                //TODO:refresh colorTableView to show change
-                }
-                else {
-                    System.err.println("ERROR: Select 2 colors to swap");
-                }
+                swap(swapSpots);
             }
         });
 
@@ -348,7 +357,7 @@ public class BitBit extends Application {
          });
     
         //Create SubMenu Edit.
-        edit.getItems().addAll(swap, clearAll);
+        edit.getItems().addAll(swapMenu, clearAll);
        
         //Create SubMenu Help.
         help.getItems().addAll(visitWebsite, showHelp);
@@ -431,6 +440,25 @@ public class BitBit extends Application {
          }
      });
     }
+    
+    /**
+     * Swap last two colors in list passed in
+     * @param swapOList
+     */
+    public void swap(ObservableList<Integer> swapOList) {
+        int i = swapOList.size();
+        if (i > 1) {
+            System.out.println("Swapping " + swapOList.get(i-2)
+                    + " and "     + swapOList.get(i-1));
+            im.getColorTable().swapColors(swapOList.get(i-2)
+                    , swapOList.get(i-1));
+            //TODO:refresh colorTableView to show change
+        }
+        else {
+            System.err.println("ERROR: Select 2 colors to swap");
+        }
+    }
+    
     public void saveBMP(String fileName) {
         try {
             im.exportBitmap(fileName);
