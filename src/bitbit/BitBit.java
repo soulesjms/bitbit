@@ -219,6 +219,8 @@ public class BitBit extends Application {
         } catch (Exception e) {
             System.err.println("Setup Image View Error\nImage: " + bitmap.bfName);
         }
+        im = bitmap;
+        
     }
 
       /**
@@ -281,6 +283,7 @@ public class BitBit extends Application {
                     tables.add(bmpUrl.getColorTable());
                 }
                 try {
+                    unifiedFlow.getChildren().removeAll(unifiedFlow.getChildren());
                     ColorTable ct = new ColorTableUnifier().unify(tables);
                     //TODO: change setupColorTableView to accept a color table
                     setupColorTableView(ct, unifiedFlow);
@@ -509,6 +512,11 @@ public class BitBit extends Application {
     
     public void saveBMP(String fileName) {
         try {
+            try {
+                im.replaceColorTable(unified);
+            } catch (AWTException ex) {
+                Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+            }
             im.exportBitmap(fileName);
         } catch (IOException ex) {
             Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
