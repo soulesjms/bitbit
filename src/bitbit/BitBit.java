@@ -53,6 +53,7 @@ public class BitBit extends Application {
     
     static Bitmap im;
     static String defaultFileIn = "/home/adam/Desktop/dumb.bmp";
+    static String defaultFileIn2 = "/home/adam/Desktop/4pixle.bmp";
     static String curFile = defaultFileIn;
     //final Image images = new Image(defaultFileIn);
     ImageView imgView = new ImageView();
@@ -117,6 +118,8 @@ public class BitBit extends Application {
          fileName = defaultFileIn;
          try {
              Bitmap curBitmap = new Bitmap(defaultFileIn);
+             Bitmap nexBitmap = new Bitmap(defaultFileIn2);
+             setupListViews(nexBitmap);
              setupImageView(curBitmap);
              setupColorTableView(curBitmap.getColorTable(), colorFlow);
              setupListViews(curBitmap);
@@ -230,7 +233,7 @@ public class BitBit extends Application {
      */
     public FlowPane setupColorTableView(ColorTable ct, FlowPane flow) {
         
-            flow.getChildren().removeAll(colorFlow.getChildren());
+            flow.getChildren().removeAll(flow.getChildren());
             int gap = 2;
             flow.setVgap(gap);
             flow.setHgap(gap);
@@ -284,9 +287,9 @@ public class BitBit extends Application {
                 }
                 try {
                     unifiedFlow.getChildren().removeAll(unifiedFlow.getChildren());
-                    ColorTable ct = new ColorTableUnifier().unify(tables);
+                    unified = new ColorTableUnifier().unify(tables);
                     //TODO: change setupColorTableView to accept a color table
-                    setupColorTableView(ct, unifiedFlow);
+                    setupColorTableView(unified, unifiedFlow);
                 } catch (AWTException ex) {
                     Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -459,7 +462,6 @@ public class BitBit extends Application {
                             if (filePath.toString().endsWith(".bmp")){
                                 try {
                                     System.out.println(filePath.toString());
-                                    curFile = filePath.toString();
                                     Bitmap bitmap = new Bitmap(filePath.toString());
                                     setupListViews(bitmap);
                                 } catch (AWTException ex) {
@@ -502,9 +504,12 @@ public class BitBit extends Application {
                     + " and "     + swapSpots.get(i-1));
             
             ct.swapColors(swapSpots.get(i-2)
-                    , swapSpots.get(i-1));
-            //TODO:refresh colorTableView to show change
+                    , swapSpots.get(i-1));            
+            System.out.println("ct: " + ct);
+                        System.out.println("u: " + unified);
+            //refresh colorTableView to show change
             setupColorTableView(ct, flow);
+            System.out.println("ct: " + ct);
         }
         else {
             System.err.println("ERROR: Select 2 colors to swap");
