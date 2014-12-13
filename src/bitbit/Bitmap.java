@@ -450,13 +450,15 @@ public class Bitmap {
             colorTable = newTable;
     }
     
+    @Override
+    public String toString() {
+        return bfName;
+    }
     /**
      * Describe the image as a string
      * @return string representation of image
      */
-    @Override
-    public String toString()
-    {
+public String debug() {
         StringBuilder buf = new StringBuilder("");
         buf.append("       name: " + bfName + "\n");
         buf.append("       size: " + bfSize + "\n");

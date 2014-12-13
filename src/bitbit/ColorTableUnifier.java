@@ -30,8 +30,8 @@ public class ColorTableUnifier {
     public static void main(String[] args) {
  
         try {
-            Bitmap bmp1 = new Bitmap("C:/Users/David/Desktop/test.bmp");
-            Bitmap bmp2 = new Bitmap("C:/Users/David/Desktop/test2.bmp");
+            Bitmap bmp1 = new Bitmap(bitbit.BitBit.defaultFileIn);
+            Bitmap bmp2 = new Bitmap(bitbit.BitBit.defaultFileIn);
             
             List<ColorTable> tables = new ArrayList<>();
             tables.add(bmp1.getColorTable());
@@ -42,8 +42,8 @@ public class ColorTableUnifier {
             bmp1.replaceColorTable(unified);
             bmp2.replaceColorTable(unified);
             
-            bmp1.exportBitmap("C:/Users/David/Desktop/test3.bmp");
-            bmp2.exportBitmap("C:/Users/David/Desktop/test4.bmp");
+            bmp1.exportBitmap("/home/adam/test3.bmp");
+            bmp2.exportBitmap("/home/adam/test4.bmp");
             
         } catch (Exception ex) {
             Logger.getLogger(ColorTableUnifier.class.getName()).log(Level.SEVERE, null, ex);

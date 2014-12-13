@@ -75,7 +75,7 @@ public class PicTerm {
                 + height);
         int stride = 1;
         int termWidth = 208 / 2;
-        stride = computeStride(termWidth);
+        stride = computeStride(width, termWidth);
         System.out.print("   ");
         System.out.println(" X");
         for (int yPixel = 0; yPixel < yMax; yPixel += stride) {
@@ -125,21 +125,21 @@ public class PicTerm {
     }
 
     //for big images, we want to skip pixels
-    public static int computeStride(int termWidth) {
+    public static int computeStride(int imageWidth, int availableWidth) {
         int stride = 1;
-        if (width > termWidth) {
+        if (imageWidth > availableWidth) {
             stride *= 2;
-            if (width > termWidth * 2) {
+            if (imageWidth > availableWidth * 2) {
                 stride *= 2;
-                if (width > termWidth * 4) {
+                if (imageWidth > availableWidth * 4) {
                     stride *= 2;
-                    if (width > termWidth * 8) {
+                    if (imageWidth > availableWidth * 8) {
                         stride *= 2;
-                        if (width > termWidth * 16) {
+                        if (imageWidth > availableWidth * 16) {
                             stride *= 2;
-                            if (width > termWidth * 32) {
+                            if (imageWidth > availableWidth * 32) {
                                 stride *= 2;
-                                if (width > termWidth * 64) {
+                                if (imageWidth > availableWidth * 64) {
                                     stride *= 2;
                                 }
                             }
