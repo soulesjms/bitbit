@@ -30,8 +30,12 @@ public class ColorTableUnifier {
     public static void main(String[] args) {
  
         try {
-            Bitmap bmp1 = new Bitmap(bitbit.BitBit.defaultFileIn);
-            Bitmap bmp2 = new Bitmap(bitbit.BitBit.defaultFileIn);
+            Bitmap bmp1 = new Bitmap("C:/Users/David/Desktop/test.bmp");
+            Bitmap bmp2 = new Bitmap("C:/Users/David/Desktop/test2.bmp");
+            
+            System.out.println("Two Bitmaps:");
+            System.out.println(bmp1.debug());
+            System.out.println(bmp2.debug());
             
             List<ColorTable> tables = new ArrayList<>();
             tables.add(bmp1.getColorTable());
@@ -39,11 +43,18 @@ public class ColorTableUnifier {
             
             ColorTable unified = new ColorTableUnifier().unify(tables);
             
+            System.out.println("Unified color table");
+            System.out.println(unified);
+            
             bmp1.replaceColorTable(unified);
             bmp2.replaceColorTable(unified);
             
-            bmp1.exportBitmap("/home/adam/test3.bmp");
-            bmp2.exportBitmap("/home/adam/test4.bmp");
+            System.out.println("Two bitmaps modified");
+            System.out.println(bmp1.debug());
+            System.out.println(bmp2.debug());
+            
+            bmp1.exportBitmap("C:/Users/David/Desktop/test3.bmp");
+            bmp2.exportBitmap("C:/Users/David/Desktop/test4.bmp");
             
         } catch (Exception ex) {
             Logger.getLogger(ColorTableUnifier.class.getName()).log(Level.SEVERE, null, ex);
