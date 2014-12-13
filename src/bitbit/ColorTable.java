@@ -29,7 +29,13 @@ public class ColorTable implements Iterable<BmpColor> {
         if (colors.size() >= MAX_COLORS) {
             throw new AWTException("Maximum of 256 colors exceeded");
         }
-        if (!colors.contains(color)) {
+        Boolean isNewColor = true;
+        for (BmpColor c : colors) {
+            if (c.equals(color)) {
+                isNewColor = false;
+            }
+        }
+        if (isNewColor) {
             colors.add(color);
         }
     }
@@ -78,6 +84,7 @@ public class ColorTable implements Iterable<BmpColor> {
         
         try {
             ct.addColor(new BmpColor(0, 0, 0));
+            ct.addColor(new BmpColor(3, 3, 3));
             ct.addColor(new BmpColor(3, 3, 3));
             ct.addColor(new BmpColor(6, 6, 6));
         } catch (AWTException e) {
