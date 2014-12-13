@@ -83,8 +83,8 @@ public class BitBit extends Application {
     Button swapBtn = new Button("Swap");
     Label swapLbl = new Label("swappoing 1 and 2");
 //ListViews
-    ListView<String> listView = new ListView<>();
-    ObservableList<String> thumbsList = FXCollections.observableArrayList();
+    ListView<Bitmap> listView = new ListView<>();
+    ObservableList<Bitmap> thumbsList = FXCollections.observableArrayList();
     ListView<String> colorBlocks = new ListView<>();
     ObservableList<String> colorsList = FXCollections.observableArrayList(); 
     //TODO: add view for list
@@ -122,8 +122,7 @@ public class BitBit extends Application {
              Bitmap curBitmap = new Bitmap(defaultFileIn);
              setupImageView(curBitmap);
              setupColorTableView(curBitmap.getColorTable(), colorFlow);
-             
-//        setupListViews(new Bitmap(defaultFileIn));
+             setupListViews(curBitmap);
              
              Scene scene = new Scene(root, sceneWidth, sceneHeight);
              
@@ -390,13 +389,8 @@ public class BitBit extends Application {
             @Override
             public void handle(ActionEvent e) {
                 List<ColorTable> tables = new ArrayList<>();
-                for (String bmpUrl : thumbsList){
-                    try {
-                        Bitmap bmp = new Bitmap(bmpUrl);
-                        tables.add(bmp.getColorTable());
-                    } catch (AWTException ex) {
-                        Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                for (Bitmap bmpUrl : thumbsList){
+                    tables.add(bmpUrl.getColorTable());
                 }
                 try {
                     ColorTable ct = new ColorTableUnifier().unify(tables);
@@ -410,31 +404,25 @@ public class BitBit extends Application {
     }
     
     //TODO: change image to array or list
-    public void setupListViews(final String fileName) {
-        //TODO: print image instead of String in listView
-//        Image image = new Image("file:" + fileName);
-        //add to color table list
-        Bitmap curBm;
-        try {
-            curBm = new Bitmap(fileName);
-            tables.add(curBm.getColorTable());
-        } catch (AWTException ex) {
-            Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        thumbsList.add(fileName);
+    public void setupListViews(final Bitmap bitmap) {
+//TODO: print image instead of String in listView
+//Image image = new Image("file:" + fileName);
+        thumbsList.add(bitmap);
         listView.setItems(thumbsList);
         listView.setPrefWidth(150);
         listView.setPrefHeight(sceneHeight - 30);
         listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            //TODO: change list to hold bitmaps
+//TODO: change list to hold bitmaps
             @Override
             public void handle(MouseEvent event) {
-                String selectedImage = listView.getSelectionModel().getSelectedItem();
-                System.out.println("Loading " + selectedImage + " in ImageView");
-
-                setupImageView(selectedImage);
-                setupColorTableView(selectedImage);
+                try {
+                   Bitmap selectedImage = listView.getSelectionModel().getSelectedItem();
+                    //System.out.println("Loading " + selectedImage.bfName + " in ImageView");
+                   // setupImageView(selectedImage.bfName);
+                    //setupColorTableView(selectedImage.bfName);
+                } catch (Exception ex) {
+                    Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -550,11 +538,15 @@ public class BitBit extends Application {
                 File file = chooser.showOpenDialog(primaryStage);
                 String fileName = file.getPath();
                 if (fileName.toLowerCase().contains(".bmp")) {
-                    curFile = fileName;
                     System.out.println(fileName);
-                    setupListViews(fileName);
-                    setupImageView(fileName);
-                    setupColorTableView(fileName);   
+                    Bitmap curBitmap;
+                    try {
+                        curBitmap = new Bitmap(fileName);
+                        setupImageView(curBitmap);
+                        setupColorTableView(curBitmap.getColorTable(), colorFlow);
+                    } catch (Exception ex) {
+                        Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 } else {
                     System.err.println("ERROR: File is not a bmp");
                 }
@@ -570,17 +562,24 @@ public class BitBit extends Application {
                 File selectedDirectory = chooser.showDialog(primaryStage);
                 System.out.println("filepath:");
                 System.out.println(selectedDirectory);
-             try {
-                 System.out.println("Bmp files found: ");
-                 thumbsList = FXCollections.observableArrayList();
-                 listView.setItems(thumbsList);
-                 Files.walk(Paths.get(selectedDirectory.getAbsolutePath())).forEach(filePath -> {
-                     if (Files.isRegularFile(filePath)) {
-                         if (filePath.toString().endsWith(".bmp")){                             
-                             System.out.println(filePath.toString());
-                             curFile = filePath.toString();
-                             setupListViews(filePath.toString());
-                         } else {
+                try {
+                    System.out.println("Bmp files found: ");
+                    thumbsList = FXCollections.observableArrayList();
+                    listView.setItems(thumbsList);
+                    Files.walk(Paths.get(selectedDirectory.getAbsolutePath())).forEach(filePath -> {
+                        if (Files.isRegularFile(filePath)) {
+                            if (filePath.toString().endsWith(".bmp")){
+                                try {
+                                    System.out.println(filePath.toString());
+                                    curFile = filePath.toString();
+                                    Bitmap bitmap = new Bitmap(filePath.toString());
+                                    setupListViews(bitmap);
+                                    setupImageView(filePath.toString());
+                                    setupColorTableView(filePath.toString());
+                                } catch (AWTException ex) {
+                                    Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            } else {
                              System.err.println("ERROR: Folder error");
                          }
                      }
@@ -596,7 +595,7 @@ public class BitBit extends Application {
                         curBitmap = new Bitmap(curFile);
                         setupImageView(curBitmap);
                         setupColorTableView(curBitmap.getColorTable(), colorFlow);
-                    } catch (AWTException ex) {
+                    } catch (Exception ex) {
                         Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
                     }
              } catch (IOException ex) {
@@ -633,19 +632,4 @@ public class BitBit extends Application {
         }
     }
     
-    //TODO: May be deleted WHEN the current setupImageView is properly workingswap
-    public void OLDsetupImageView(String url) {
-        //TODO: make images same as images variable in constructor
-        //PROBLEM: for some reason, smooth set to false does NOT work for bmp
-        
-        //                                                  preserve ratio, smooth 
-        //Image images = new Image(url, sceneWidth/2, sceneWidth/2/2, true, false);
-        //Image images = new Image("file:/home/adam/Desktop/P3183616.JPG");
-        Image image = new Image(url);
-        System.out.println("SetupImageView: " + url);
-        imgView.setImage(image);
-        imgView.setFitWidth(400);
-        imgView.setPreserveRatio(true);
-        imgView.setSmooth(false);
-    }
 }
