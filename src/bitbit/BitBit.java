@@ -430,6 +430,7 @@ public class BitBit extends Application {
                     try {
                         curBitmap = new Bitmap(fileName);
                         setupImageView(curBitmap);
+                        setupListViews(curBitmap);
                         setupColorTableView(curBitmap.getColorTable(), colorFlow);
                     } catch (Exception ex) {
                         Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
