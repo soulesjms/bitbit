@@ -505,11 +505,8 @@ public class BitBit extends Application {
             
             ct.swapColors(swapSpots.get(i-2)
                     , swapSpots.get(i-1));            
-            System.out.println("ct: " + ct);
-                        System.out.println("u: " + unified);
             //refresh colorTableView to show change
             setupColorTableView(ct, flow);
-            System.out.println("ct: " + ct);
         }
         else {
             System.err.println("ERROR: Select 2 colors to swap");
