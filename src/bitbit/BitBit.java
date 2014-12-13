@@ -53,8 +53,8 @@ public class BitBit extends Application {
     List<ColorTable> tables = new ArrayList<>();
     
     static Bitmap im;
-    static String defaultFileIn = "C:\\Users\\Jonny\\Desktop\\BMPtests\\4pixle.bmp";
-    static String defaultFileIn2 = "C:\\Users\\Jonny\\Desktop\\BMPtests\\4pixle2.bmp";
+    static String defaultFileIn = "/home/adam/Desktop/4pixle.bmp";
+    static String defaultFileIn2 = "/home/adam/Desktop/n.bmp";
     static String curFile = defaultFileIn;
     //final Image images = new Image(defaultFileIn);
     ImageView imgView = new ImageView();
@@ -108,19 +108,15 @@ public class BitBit extends Application {
     
      @Override
      public void start(final Stage primaryStage) {
-         primaryStage.setTitle("BitBit");
-         primaryStage.getIcons().add(new Image("file:src\\resources\\icon.png"));
+         primaryStage.getIcons().add(new Image("file:src//resources//icon.png"));
          GridPane grid = new GridPane();
          
          setupMenus(primaryStage);
          setupFileBoxes(primaryStage);
          setupButtons();
          
-         
-         String fileName = defaultFileIn;
-         
-         fileName = defaultFileIn;
          try {
+             //TODO: remove these
              Bitmap curBitmap = new Bitmap(defaultFileIn);
              Bitmap nexBitmap = new Bitmap(defaultFileIn2);
              setupListViews(nexBitmap);
@@ -142,15 +138,14 @@ public class BitBit extends Application {
              //TODO: change im.get... to unified(and getUnified beforehand)
              unifiedSPane.setContent(setupColorTableView(curBitmap.getColorTable(), unifiedFlow));
              
-//col, row, coltakeup, rowtakeup
+             //col, row, coltakeup, rowtakeup
              grid.add(mainMenu,      0, 0, 7, 1); //menu Bar
              grid.add(listView,      0, 1, 1, 2); //list of files
              grid.add(imgViewBlocks, 1, 1, 1, 2); //image display
              grid.add(swapBtn,       2, 0, 1, 1); //swap button
-//        grid.add(swapLbl,       2, 1, 1, 1);
+             //        grid.add(swapLbl,       2, 1, 1, 1);
              grid.add(colorFlow,     2, 1, 2, 1); //color table display
              grid.add(generateColorTable, 3, 0, 1, 1);
-//        grid.add(swapLbl,          2, 1, 1, 1);
              grid.add(colorSPane,         2, 1, 2, 1); //color table display
              grid.add(unifiedSPane,       2, 2, 2, 1); //color table display
              
@@ -162,7 +157,7 @@ public class BitBit extends Application {
          }    
     }
 
-    //a sort of destructor
+    //a sort of destructor, called when program exits
     @Override
     public void stop() {
         System.out.println("Bye");
@@ -174,12 +169,12 @@ public class BitBit extends Application {
         try {
             imgViewBlocks.getChildren().removeAll(imgViewBlocks.getChildren());
 
-//spacing between pixels
+            //spacing between pixels
             int gap = 0;
-//imgViewBlocks = new FlowPane();
+            
             imgViewBlocks.setVgap(gap);
             imgViewBlocks.setHgap(gap);
-//displayWidth
+            //displayWidth
             int dWidth = bitmap.biWidth;
             int wrapLength = 400;
             while (dWidth < (wrapLength-bitmap.biWidth)) {
@@ -187,25 +182,24 @@ public class BitBit extends Application {
             }
             System.out.println("Display Width " + dWidth);
             imgViewBlocks.setPrefWrapLength(dWidth+gap*(bitmap.biWidth+1));
-//track spot in loop
+            //track spot in loop
             int i = 0;
             for (int perPix : bitmap.pix) {
-//System.out.print(perPix);
                 if ((i+1)%bitmap.biWidth == 0) {
-//System.out.println();
+                //reached end of line
                 }
                 try {
-//traverse colorTable of image and dereferrence proper colors
+                    //traverse colorTable of image and dereferrence proper colors
                     Color co = Color.rgb(bitmap.getColorTable().getColor(perPix).getRed()
                             , bitmap.getColorTable().getColor(perPix).getGreen()
                             , bitmap.getColorTable().getColor(perPix).getBlue());
                     final Rectangle r = new Rectangle(dWidth/bitmap.biWidth, dWidth/bitmap.biWidth, co);
                     final int iTemp = i;
-//grab selected rectangle only and print its color
+                    //grab selected rectangle only and print its color
                     r.setOnMouseClicked(new EventHandler<MouseEvent>() {
                         @Override
                         public void handle(MouseEvent event) {
-//To get color from selected rectangle
+                            //get color from selected rectangle
                             String colorString = "ERROR CONVERTING COLOR TO STRING";
                             if (r.toString().contains("fill=0x")) {
                                 colorString = r.toString().split("fill=0x")[1];
@@ -216,8 +210,7 @@ public class BitBit extends Application {
                             swapSpots.add(perPix);
                         }
                     });
-// Configure the rectangle
-// Add it to the imgViewBlocks container
+                    // Configure rectangle and add to the imgViewBlocks
                     imgViewBlocks.getChildren().add(r);
                     i++;
                 } catch (IllegalArgumentException e) {
@@ -226,8 +219,8 @@ public class BitBit extends Application {
         } catch (Exception e) {
             System.err.println("Setup Image View Error\nImage: " + bitmap.bfName);
         }
+        //im is for use in export
         im = bitmap;
-        
     }
 
       /**
@@ -243,8 +236,6 @@ public class BitBit extends Application {
             flow.setHgap(gap);
             flow.setPrefWrapLength(400-imgViewBlocks.getPrefWrapLength()+150);
                                          
-            //track spot in loop
-            int i = 0;
             for (int count = 0; count < ct.getNumColors(); count++) {
                 try {
                     Color co;
@@ -253,7 +244,7 @@ public class BitBit extends Application {
                             ct.getColor(count).getBlue());
 
                     final Rectangle r = new Rectangle(15, 15, co);
-                    final int iTemp = i;
+                    final int iTemp = count;
                     r.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
                         @Override
@@ -266,7 +257,6 @@ public class BitBit extends Application {
                     });
                     // add rectangle to flow container
                     flow.getChildren().add(r);
-                    i++;
                 } catch (IllegalArgumentException e) {
                     System.err.println("Color making failed");
                 }
@@ -292,7 +282,6 @@ public class BitBit extends Application {
                 try {
                     unifiedFlow.getChildren().removeAll(unifiedFlow.getChildren());
                     unified = new ColorTableUnifier().unify(tables);
-                    //TODO: change setupColorTableView to accept a color table
                     setupColorTableView(unified, unifiedFlow);
                 } catch (AWTException ex) {
                     Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
@@ -301,16 +290,14 @@ public class BitBit extends Application {
         });
     }
     
-    //TODO: change image to array or list
     public void setupListViews(final Bitmap bitmap) {
-//TODO: print image instead of String in listView
-//Image image = new Image("file:" + fileName);
+        //TODO: print image instead of String in listView
         thumbsList.add(bitmap);
         listView.setItems(thumbsList);
         listView.setPrefWidth(150);
         listView.setPrefHeight(sceneHeight - 30);
         listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//TODO: change list to hold bitmaps
+
             @Override
             public void handle(MouseEvent event) {
                    Bitmap selectedImage = listView.getSelectionModel().getSelectedItem();
@@ -330,6 +317,7 @@ public class BitBit extends Application {
         exitApp.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
         file.getItems().addAll(openFile, openFolder, saveMenuBtn, saveAs, saveAll, exitApp);
 
+        //TODO: remove-
         saveMenuBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -338,6 +326,7 @@ public class BitBit extends Application {
                     saveBMP(fileName);
             }
         });
+        //TODO: get working again, just do what swapBtn does
         /*        swapMenu.setOnAction(new EventHandler<ActionEvent>() {
         @Override
         public void handle(ActionEvent event) {
@@ -439,7 +428,7 @@ public class BitBit extends Application {
             }
         });
 
-        //TODO: change to load folder of images into list
+        //load folder of bmps into list
         openFile.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -519,6 +508,8 @@ public class BitBit extends Application {
     
     /**
      * Swap last two colors in list passed in
+     * @param ct
+     * @param flow
      */
     public void swap(ColorTable ct, FlowPane flow) {
         int i = swapSpots.size();
