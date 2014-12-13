@@ -105,39 +105,44 @@ public class BitBit extends Application {
     
      @Override
     public void start(final Stage primaryStage) {
-        GridPane grid = new GridPane();
-
-        setupMenus(primaryStage);
-        setupFileBoxes(primaryStage);
-        setupButtons();
-        
-        
-        String fileName = defaultFileIn;
-
-        fileName = defaultFileIn;
-        setupListViews(fileName);
-        setupImageView(fileName);
-        setupColorTableView(fileName);
-
-        Scene scene = new Scene(root, sceneWidth, sceneHeight);
-        
-        //Add the ToolBar and Main Menu to the VBox
-        topContainer.getChildren().addAll(mainMenu, toolBar);
-
-        root.setTop(grid);
-        
-        //col, row, coltakeup, rowtakeup
-        grid.add(mainMenu,      0, 0, 7, 1); //menu Bar
-        grid.add(listView,      0, 1, 1, 2); //list of files
-        grid.add(imgViewBlocks, 1, 1, 1, 2); //image display
-        grid.add(swapBtn,       2, 0, 1, 1); //swap button
+        try {
+            GridPane grid = new GridPane();
+            
+            setupMenus(primaryStage);
+            setupFileBoxes(primaryStage);
+            setupButtons();
+            
+            
+            String fileName = defaultFileIn;
+            
+            fileName = defaultFileIn;
+            Bitmap bitmap = new Bitmap(fileName);
+            setupListViews(bitmap);
+            setupImageView(fileName);
+            setupColorTableView(fileName);
+            
+            Scene scene = new Scene(root, sceneWidth, sceneHeight);
+            
+            //Add the ToolBar and Main Menu to the VBox
+            topContainer.getChildren().addAll(mainMenu, toolBar);
+            
+            root.setTop(grid);
+            
+            //col, row, coltakeup, rowtakeup
+            grid.add(mainMenu,      0, 0, 7, 1); //menu Bar
+            grid.add(listView,      0, 1, 1, 2); //list of files
+            grid.add(imgViewBlocks, 1, 1, 1, 2); //image display
+            grid.add(swapBtn,       2, 0, 1, 1); //swap button
 //        grid.add(swapLbl,       2, 1, 1, 1);
-        grid.add(colorFlow,     2, 1, 2, 1); //color table display
-        grid.add(generateColorTable, 3, 0, 1, 1); 
-
-        primaryStage.setTitle("BitBit");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+            grid.add(colorFlow,     2, 1, 2, 1); //color table display
+            grid.add(generateColorTable, 3, 0, 1, 1);
+            
+            primaryStage.setTitle("BitBit");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        } catch (AWTException ex) {
+            Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     //a sort of destructor
@@ -275,10 +280,11 @@ public class BitBit extends Application {
           });
     }
     //TODO: change image to array or list
-    public void setupListViews(final String fileName) {
+    public void setupListViews(final Bitmap bitmap) {
         //TODO: print image instead of String in listView
 //        Image image = new Image("file:" + fileName);
-        thumbsList.add(fileName);
+        
+        thumbsList.add(bitmap.bfName);
         listView.setItems(thumbsList);
         listView.setPrefWidth(150);
         listView.setPrefHeight(sceneHeight - 30);
@@ -428,11 +434,16 @@ public class BitBit extends Application {
                 File file = chooser.showOpenDialog(primaryStage);
                 String fileName = file.getPath();
                 if (fileName.toLowerCase().contains(".bmp")) {
-                    curFile = fileName;
-                    System.out.println(fileName);
-                    setupListViews(fileName);
-                    setupImageView(fileName);
-                    setupColorTableView(fileName);   
+                    try {
+                        curFile = fileName;
+                        Bitmap bitmap = new Bitmap(fileName);
+                        System.out.println(fileName);
+                        setupListViews(bitmap);
+                        setupImageView(fileName);   
+                        setupColorTableView(fileName);
+                    } catch (AWTException ex) {
+                        Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 } else {
                     System.err.println("ERROR: File is not a bmp");
                 }
@@ -455,11 +466,16 @@ public class BitBit extends Application {
                  Files.walk(Paths.get(selectedDirectory.getAbsolutePath())).forEach(filePath -> {
                      if (Files.isRegularFile(filePath)) {
                          if (filePath.toString().endsWith(".bmp")){                             
-                             System.out.println(filePath.toString());
-                             curFile = filePath.toString();
-                             setupListViews(filePath.toString());
-                             setupImageView(filePath.toString());
-                             setupColorTableView(filePath.toString());
+                             try {
+                                 System.out.println(filePath.toString());
+                                 curFile = filePath.toString();
+                                 Bitmap bitmap = new Bitmap(filePath.toString());
+                                 setupListViews(bitmap);
+                                 setupImageView(filePath.toString());
+                                 setupColorTableView(filePath.toString());
+                             } catch (AWTException ex) {
+                                 Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+                             }
                          } else {
                              System.err.println("ERROR: Folder error");
                          }
