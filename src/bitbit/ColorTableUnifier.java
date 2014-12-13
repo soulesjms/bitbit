@@ -48,8 +48,5 @@ public class ColorTableUnifier {
         } catch (Exception ex) {
             Logger.getLogger(ColorTableUnifier.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
     }
-    
 }
