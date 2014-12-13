@@ -81,8 +81,8 @@ public class BitBit extends Application {
     Button generateColorTable = new Button("Generate Color Table");
     Label swapLbl = new Label("swappoing 1 and 2");
 //ListViews
-    ListView<String> listView = new ListView<>();
-    ObservableList<String> thumbsList = FXCollections.observableArrayList();
+    ListView<Bitmap> listView = new ListView<>();
+    ObservableList<Bitmap> thumbsList = FXCollections.observableArrayList();
     ListView<String> colorBlocks = new ListView<>();
     ObservableList<String> colorsList = FXCollections.observableArrayList(); 
     //TODO: add view for list
@@ -282,9 +282,9 @@ public class BitBit extends Application {
     //TODO: change image to array or list
     public void setupListViews(final Bitmap bitmap) {
         //TODO: print image instead of String in listView
-//        Image image = new Image("file:" + fileName);
+        //Image image = new Image("file:" + fileName);
         
-        thumbsList.add(bitmap.bfName);
+        thumbsList.add(bitmap);
         listView.setItems(thumbsList);
         listView.setPrefWidth(150);
         listView.setPrefHeight(sceneHeight - 30);
@@ -292,11 +292,14 @@ public class BitBit extends Application {
             //TODO: change list to hold bitmaps
             @Override
             public void handle(MouseEvent event) {
-                String selectedImage = listView.getSelectionModel().getSelectedItem();
-                System.out.println("Loading " + selectedImage + " in ImageView");
-
-                setupImageView(selectedImage);
-                setupColorTableView(selectedImage);
+                try {
+                Bitmap selectedImage = listView.getSelectionModel().getSelectedItem();
+                System.out.println("Loading " + selectedImage.bfName + " in ImageView");
+                setupImageView(selectedImage.bfName);
+                setupColorTableView(selectedImage.bfName);
+                } catch (Exception ex) {
+                    Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -333,8 +336,8 @@ public class BitBit extends Application {
                 imgViewBlocks.getChildren().removeAll(imgViewBlocks.getChildren());
                 colorFlow.getChildren().removeAll(colorFlow.getChildren());
                 //Want to clear list on left side as well?
-                //thumbsList = FXCollections.observableArrayList();
-                //listView.setItems(thumbsList);
+                thumbsList = FXCollections.observableArrayList();
+                listView.setItems(thumbsList);
             }
         });
 
@@ -381,13 +384,8 @@ public class BitBit extends Application {
             @Override
             public void handle(ActionEvent e) {
                 List<ColorTable> tables = new ArrayList<>();
-                for (String bmpUrl : thumbsList){
-                    try {
-                        Bitmap bmp = new Bitmap(bmpUrl);
-                        tables.add(bmp.getColorTable());
-                    } catch (AWTException ex) {
-                        Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                for (Bitmap bmpUrl : thumbsList){
+                    tables.add(bmpUrl.getColorTable());
                 }
                 try {
                     ColorTable ct = new ColorTableUnifier().unify(tables);
