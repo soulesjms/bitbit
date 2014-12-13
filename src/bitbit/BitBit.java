@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -46,9 +48,11 @@ import javafx.stage.DirectoryChooser;
  */
 public class BitBit extends Application {
 
-    static boolean FIRSTRUNTEST = true;
+    ColorTable unified;
+    List<ColorTable> tables = new ArrayList<>();
+    
     static Bitmap im;
-    static String defaultFileIn = "/home/adam/Documents/java/NetBeansProjects/bitbit/src/resources/fun.bmp";
+    static String defaultFileIn = "/home/adam/Desktop/dumb.bmp";
     static String curFile = defaultFileIn;
     //TODO: change images to be an array
     //final Image images = new Image(defaultFileIn);
@@ -141,63 +145,55 @@ public class BitBit extends Application {
     
     //TODO: find speedier alternative, this is slower than anything
     public void setupImageView(String url) {
-
         System.out.println("Setting imageView for: " + url);
         try {
             imgViewBlocks.getChildren().removeAll(imgViewBlocks.getChildren());
-           
             Bitmap im = new Bitmap(url);
-            //System.out.println("Output:\n" + im);
-            
-            //spacing between pixels
+//System.out.println("Output:\n" + im);
+//spacing between pixels
             int gap = 0;
-            //imgViewBlocks = new FlowPane();
+//imgViewBlocks = new FlowPane();
             imgViewBlocks.setVgap(gap);
             imgViewBlocks.setHgap(gap);
-            //displayWidth
+//displayWidth
             int dWidth = im.biWidth;
             int wrapLength = 400;
-            
             while (dWidth < (wrapLength-im.biWidth)) {
                 dWidth += im.biWidth;
             }
             System.out.println("Display Width " + dWidth);
             imgViewBlocks.setPrefWrapLength(dWidth+gap*(im.biWidth+1));
-            
-            //track spot in loop
+//track spot in loop
             int i = 0;
             for (int perPix : im.pix) {
-                //System.out.print(perPix);
+//System.out.print(perPix);
                 if ((i+1)%im.biWidth == 0) {
-                    //System.out.println();
+//System.out.println();
                 }
                 try {
-                    //traverse colorTable of image and dereferrence proper colors
+//traverse colorTable of image and dereferrence proper colors
                     Color co = Color.rgb(im.getColorTable().getColor(perPix).getRed()
-                        ,                im.getColorTable().getColor(perPix).getGreen()
-                        ,                im.getColorTable().getColor(perPix).getBlue());
-                    final Rectangle r = new Rectangle(dWidth/im.biWidth, dWidth/im.biWidth, co);                    
+                            , im.getColorTable().getColor(perPix).getGreen()
+                            , im.getColorTable().getColor(perPix).getBlue());
+                    final Rectangle r = new Rectangle(dWidth/im.biWidth, dWidth/im.biWidth, co);
                     final int iTemp = i;
-                    //grab selected rectangle only and print its color
+//grab selected rectangle only and print its color
                     r.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                        
                         @Override
                         public void handle(MouseEvent event) {
-                            
-                            //To get color from selected rectangle
+//To get color from selected rectangle
                             String colorString = "ERROR CONVERTING COLOR TO STRING";
                             if (r.toString().contains("fill=0x")) {
                                 colorString = r.toString().split("fill=0x")[1];
                             }
-                            
                             String selectedItem = colorString.substring(0, 6);
-                            System.out.println("Selecting [" + perPix + "] " 
-                                       + selectedItem + " [" + iTemp + "] in pixel array");
+                            System.out.println("Selecting [" + perPix + "] "
+                                    + selectedItem + " [" + iTemp + "] in pixel array");
                             swapSpots.add(perPix);
                         }
                     });
-                    // Configure the rectangle
-                    // Add it to the imgViewBlocks container
+// Configure the rectangle
+// Add it to the imgViewBlocks container
                     imgViewBlocks.getChildren().add(r);
                     i++;
                 } catch (IllegalArgumentException e) {
@@ -223,7 +219,7 @@ public class BitBit extends Application {
             colorFlow.setVgap(2);
             colorFlow.setHgap(2);
             colorFlow.setPrefWrapLength(400-imgViewBlocks.getPrefWrapLength()+150);
-            
+                                         
             //track spot in loop
             int i = 0;
             for (int count = 0; count < im.getColorTable().getNumColors(); count++) {
@@ -263,7 +259,7 @@ public class BitBit extends Application {
                         public void handle(MouseEvent event) {
                             //TODO: swap last selected!
                             System.out.println("SWAP BTN");
-                            swap(swapSpots);
+                            swap();
                         }
                     });
     }
@@ -271,6 +267,15 @@ public class BitBit extends Application {
     public void setupListViews(final String fileName) {
         //TODO: print image instead of String in listView
 //        Image image = new Image("file:" + fileName);
+        //add to color table list
+        Bitmap curBm;
+        try {
+            curBm = new Bitmap(fileName);
+            tables.add(curBm.getColorTable());
+        } catch (AWTException ex) {
+            Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         thumbsList.add(fileName);
         listView.setItems(thumbsList);
         listView.setPrefWidth(150);
@@ -300,15 +305,15 @@ public class BitBit extends Application {
         saveMenuBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                    System.out.println("Saving");
                     String fileName = "/home/adam/Desktop/exported.bmp";
+                    System.out.println("Saving to " + fileName);
                     saveBMP(fileName);
             }
         });
         swapMenu.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                swap(swapSpots);
+                swap();
             }
         });
 
@@ -324,8 +329,7 @@ public class BitBit extends Application {
                 //listView.setItems(thumbsList);
             }
         });
-
-
+        
         exitApp.setOnAction(new EventHandler<ActionEvent>() {
            @Override
            public void handle(ActionEvent event) {
@@ -379,7 +383,8 @@ public class BitBit extends Application {
                         saveBMP(fileName);
                     } 
                     else {
-                        System.out.println("Not good to save to that type of file");
+                        System.out.println("Not good to save to that type of file, adding .bmp");
+                        saveBMP(fileName+".bmp");
                     }
                 } else {
                     System.out.println("ERROR: save path is empty");
@@ -427,13 +432,19 @@ public class BitBit extends Application {
                              System.out.println(filePath.toString());
                              curFile = filePath.toString();
                              setupListViews(filePath.toString());
-                             setupImageView(filePath.toString());
-                             setupColorTableView(filePath.toString());
                          } else {
                              System.err.println("ERROR: Folder error");
                          }
                      }
                  });
+                 setupImageView(curFile);
+                 //Add tables to unified color table
+                    try {
+                        unified = new ColorTableUnifier().unify(tables);
+                    } catch (AWTException ex) {
+                        Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    setupColorTableView(curFile);
              } catch (IOException ex) {
                  Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
              }
@@ -443,15 +454,15 @@ public class BitBit extends Application {
     
     /**
      * Swap last two colors in list passed in
-     * @param swapOList
      */
-    public void swap(ObservableList<Integer> swapOList) {
-        int i = swapOList.size();
+    public void swap() {
+        int i = swapSpots.size();
         if (i > 1) {
-            System.out.println("Swapping " + swapOList.get(i-2)
-                    + " and "     + swapOList.get(i-1));
-            im.getColorTable().swapColors(swapOList.get(i-2)
-                    , swapOList.get(i-1));
+            System.out.println("Swapping " + swapSpots.get(i-2)
+                    + " and "     + swapSpots.get(i-1));
+            
+            im.getColorTable().swapColors(swapSpots.get(i-2)
+                    , swapSpots.get(i-1));
             //TODO:refresh colorTableView to show change
         }
         else {
@@ -467,7 +478,7 @@ public class BitBit extends Application {
         }
     }
     
-    //TODO: May be deleted WHEN the current setupImageView is properly working
+    //TODO: May be deleted WHEN the current setupImageView is properly workingswap
     public void OLDsetupImageView(String url) {
         //TODO: make images same as images variable in constructor
         //PROBLEM: for some reason, smooth set to false does NOT work for bmp
