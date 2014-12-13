@@ -16,6 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -106,6 +107,8 @@ public class BitBit extends Application {
         setupMenus(primaryStage);
         setupFileBoxes(primaryStage);
         setupButtons();
+        
+        
         String fileName = defaultFileIn;
 
         fileName = defaultFileIn;
@@ -120,13 +123,16 @@ public class BitBit extends Application {
 
         root.setTop(grid);
         
+        Button generateColorTable = new Button("Generate Color Table");
+        
         //col, row, coltakeup, rowtakeup
-        grid.add(mainMenu,      0, 0, 7, 1);
-        grid.add(listView,      0, 1, 1, 1);
-        grid.add(imgViewBlocks, 1, 1, 1, 1);
-        grid.add(swapBtn,       2, 0, 1, 1);
+        grid.add(mainMenu,      0, 0, 7, 1); //menu Bar
+        grid.add(listView,      0, 1, 1, 2); //list of files
+        grid.add(imgViewBlocks, 1, 1, 1, 2); //image display
+        grid.add(swapBtn,       2, 0, 1, 1); //swap button
 //        grid.add(swapLbl,       2, 1, 1, 1);
-        grid.add(colorFlow,     2, 1, 1, 1);
+        grid.add(colorFlow,     2, 1, 2, 1); //color table display
+        grid.add(generateColorTable, 3, 0, 1, 1); 
 
         primaryStage.setTitle("BitBit");
         primaryStage.setScene(scene);
@@ -257,15 +263,15 @@ public class BitBit extends Application {
         }
     }
     public void setupButtons() {
-              swapBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        swapBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
-                        @Override
-                        public void handle(MouseEvent event) {
-                            //TODO: swap last selected!
-                            System.out.println("SWAP BTN");
-                            swap(swapSpots);
-                        }
-                    });
+              @Override
+              public void handle(MouseEvent event) {
+                  //TODO: swap last selected!
+                  System.out.println("SWAP BTN");
+                  swap(swapSpots);
+              }
+          });
     }
     //TODO: change image to array or list
     public void setupListViews(final String fileName) {
@@ -421,6 +427,8 @@ public class BitBit extends Application {
                 System.out.println(selectedDirectory);
              try {
                  System.out.println("Bmp files found: ");
+                 thumbsList = FXCollections.observableArrayList();
+                 listView.setItems(thumbsList);
                  Files.walk(Paths.get(selectedDirectory.getAbsolutePath())).forEach(filePath -> {
                      if (Files.isRegularFile(filePath)) {
                          if (filePath.toString().endsWith(".bmp")){                             
