@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -76,6 +78,7 @@ public class BitBit extends Application {
     MenuItem showHelp = new MenuItem("Show Help");
 //Buttons
     Button swapBtn = new Button("Swap");
+    Button generateColorTable = new Button("Generate Color Table");
     Label swapLbl = new Label("swappoing 1 and 2");
 //ListViews
     ListView<String> listView = new ListView<>();
@@ -122,8 +125,6 @@ public class BitBit extends Application {
         topContainer.getChildren().addAll(mainMenu, toolBar);
 
         root.setTop(grid);
-        
-        Button generateColorTable = new Button("Generate Color Table");
         
         //col, row, coltakeup, rowtakeup
         grid.add(mainMenu,      0, 0, 7, 1); //menu Bar
@@ -369,6 +370,28 @@ public class BitBit extends Application {
         help.getItems().addAll(visitWebsite, showHelp);
 
         mainMenu.getMenus().addAll(file, edit, help);
+        
+        generateColorTable.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                List<ColorTable> tables = new ArrayList<>();
+                for (String bmpUrl : thumbsList){
+                    try {
+                        Bitmap bmp = new Bitmap(bmpUrl);
+                        tables.add(bmp.getColorTable());
+                    } catch (AWTException ex) {
+                        Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                try {
+                    ColorTable ct = new ColorTableUnifier().unify(tables);
+                } catch (AWTException ex) {
+                    Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                //TODO: change setupColorTableView to accept a color table
+                //setupColorTableView(ct, unifiedFlow);
+            }
+        });
     }
 
     public void setupFileBoxes(final Stage primaryStage) {
