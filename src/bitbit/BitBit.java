@@ -27,6 +27,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToolBar;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -52,8 +53,8 @@ public class BitBit extends Application {
     List<ColorTable> tables = new ArrayList<>();
     
     static Bitmap im;
-    static String defaultFileIn = "/home/adam/Desktop/dumb.bmp";
-    static String defaultFileIn2 = "/home/adam/Desktop/4pixle.bmp";
+    static String defaultFileIn = "C:\\Users\\Jonny\\Desktop\\BMPtests\\4pixle.bmp";
+    static String defaultFileIn2 = "C:\\Users\\Jonny\\Desktop\\BMPtests\\4pixle2.bmp";
     static String curFile = defaultFileIn;
     //final Image images = new Image(defaultFileIn);
     ImageView imgView = new ImageView();
@@ -70,6 +71,7 @@ public class BitBit extends Application {
     MenuItem openFile = new MenuItem("Open File");
     MenuItem saveAs = new MenuItem("Save as...");
     MenuItem saveMenuBtn = new MenuItem("Save");
+    MenuItem saveAll = new MenuItem("Save all");
     MenuItem exitApp = new MenuItem("Quit");
     Menu edit = new Menu("Edit");
     MenuItem swapMenu = new MenuItem("Swap");
@@ -106,6 +108,8 @@ public class BitBit extends Application {
     
      @Override
      public void start(final Stage primaryStage) {
+         primaryStage.setTitle("BitBit");
+         primaryStage.getIcons().add(new Image("file:src\\resources\\icon.png"));
          GridPane grid = new GridPane();
          
          setupMenus(primaryStage);
@@ -150,7 +154,7 @@ public class BitBit extends Application {
              grid.add(colorSPane,         2, 1, 2, 1); //color table display
              grid.add(unifiedSPane,       2, 2, 2, 1); //color table display
              
-             primaryStage.setTitle("BitBit");
+             primaryStage.setTitle("PixiMagic");
              primaryStage.setScene(scene);
              primaryStage.show();
          } catch (AWTException ex) {
@@ -321,9 +325,10 @@ public class BitBit extends Application {
         openFile.setAccelerator(KeyCombination.keyCombination("Ctrl+O"));
         openFolder.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+O"));
         saveAs.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+S"));
+        saveAll.setAccelerator(KeyCombination.keyCombination("Ctrl+Alt+S"));
         saveMenuBtn.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         exitApp.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
-        file.getItems().addAll(openFile, openFolder, saveMenuBtn, saveAs, exitApp);
+        file.getItems().addAll(openFile, openFolder, saveMenuBtn, saveAs, saveAll, exitApp);
 
         saveMenuBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -412,6 +417,24 @@ public class BitBit extends Application {
                     }
                 } else {
                     System.out.println("ERROR: save path is empty");
+                }
+            }
+        });
+        
+        saveAll.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                List<ColorTable> tables = new ArrayList<>();
+                for (Bitmap bmpUrl : thumbsList){
+                    tables.add(bmpUrl.getColorTable());
+                }
+                try {
+                    unifiedFlow.getChildren().removeAll(unifiedFlow.getChildren());
+                    unified = new ColorTableUnifier().unify(tables);
+                    //TODO: change setupColorTableView to accept a color table
+                    setupColorTableView(unified, unifiedFlow);
+                } catch (AWTException ex) {
+                    Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
