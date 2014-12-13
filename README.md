@@ -4,12 +4,11 @@ bitbit
 8-bit Bitmap animation utility
 <h4>TODO:</h4>
 <ul>
-<li>✓ Color table class connected to bitmap class</li>
-<li>✓ Color table display that loads color table from currently selected bitmap</li>
-<li>✓ Swap button and logic for color table values</li>
-<li>Swap also change pixels to match their old color values</li>
-<li>Load all bitmaps from folder</li>
-<li>✓ Write out the edited bitmap(s)</li>
+<li>Fix open file menu button</li>
+<li>Add functionality to save and save as with unified color table </li>
+<li>Add save all button with above functionality</li>
+<li>fix replace color table function</li>
+<li>✓ </li>
 </ul>
 ![Screenshot](/src/screenshots/1.png?raw=true "bitbit screenshot")
 
