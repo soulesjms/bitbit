@@ -49,7 +49,7 @@ import javafx.stage.DirectoryChooser;
  */
 public class BitBit extends Application {
 
-    ColorTable unified;
+    ColorTable unified = new ColorTable();
     List<ColorTable> tables = new ArrayList<>();
     
     static Bitmap im;
@@ -108,7 +108,6 @@ public class BitBit extends Application {
     
      @Override
      public void start(final Stage primaryStage) {
-         primaryStage.getIcons().add(new Image("file:src//resources//icon.png"));
          GridPane grid = new GridPane();
          
          setupMenus(primaryStage);
@@ -121,7 +120,7 @@ public class BitBit extends Application {
              Bitmap nexBitmap = new Bitmap(defaultFileIn2);
              setupListViews(nexBitmap);
              setupImageView(curBitmap);
-             setupColorTableView(curBitmap.getColorTable(), colorFlow);
+             setupColorTableView(curBitmap.getColorTable(), colorFlow, false);
              setupListViews(curBitmap);
              
              Scene scene = new Scene(root, sceneWidth, sceneHeight);
@@ -135,8 +134,7 @@ public class BitBit extends Application {
              colorSPane.setContent(colorFlow);
              
              ScrollPane unifiedSPane = new ScrollPane();
-             //TODO: change im.get... to unified(and getUnified beforehand)
-             unifiedSPane.setContent(setupColorTableView(curBitmap.getColorTable(), unifiedFlow));
+             unifiedSPane.setContent(setupColorTableView(unified, unifiedFlow, true));
              
              //col, row, coltakeup, rowtakeup
              grid.add(mainMenu,      0, 0, 7, 1); //menu Bar
@@ -152,6 +150,7 @@ public class BitBit extends Application {
              primaryStage.setTitle("PixiMagic");
              primaryStage.setScene(scene);
              primaryStage.show();
+             primaryStage.getIcons().add(new Image("file:src//resources//icon.png"));
          } catch (AWTException ex) {
              Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
          }    
@@ -207,7 +206,6 @@ public class BitBit extends Application {
                             String selectedItem = colorString.substring(0, 6);
                             System.out.println("Selecting [" + perPix + "] "
                                     + selectedItem + " [" + iTemp + "] in pixel array");
-                            swapSpots.add(perPix);
                         }
                     });
                     // Configure rectangle and add to the imgViewBlocks
@@ -228,7 +226,7 @@ public class BitBit extends Application {
      * Loads Image's colorTable into ColorTableView.
      * @param fileName
      */
-    public FlowPane setupColorTableView(ColorTable ct, FlowPane flow) {
+    public FlowPane setupColorTableView(ColorTable ct, FlowPane flow, boolean isClickable) {
         
             flow.getChildren().removeAll(flow.getChildren());
             int gap = 2;
@@ -245,16 +243,18 @@ public class BitBit extends Application {
 
                     final Rectangle r = new Rectangle(15, 15, co);
                     final int iTemp = count;
-                    r.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-                        @Override
-                        public void handle(MouseEvent event) {
-                            //TODO: grab selected item only
-                            String selectedItem = r.toString().substring(56, 62);
-                            System.out.println("Selecting [" + iTemp + "] " + selectedItem);
-                            swapSpots.add(iTemp);
-                        }
-                    });
+                    if (isClickable) {
+                        r.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                            
+                            @Override
+                            public void handle(MouseEvent event) {
+                                //TODO: grab selected item only
+                                String selectedItem = r.toString().substring(56, 62);
+                                System.out.println("Selecting [" + iTemp + "] " + selectedItem);
+                                swapSpots.add(iTemp);
+                            }
+                        });
+                    }
                     // add rectangle to flow container
                     flow.getChildren().add(r);
                 } catch (IllegalArgumentException e) {
@@ -282,7 +282,7 @@ public class BitBit extends Application {
                 try {
                     unifiedFlow.getChildren().removeAll(unifiedFlow.getChildren());
                     unified = new ColorTableUnifier().unify(tables);
-                    setupColorTableView(unified, unifiedFlow);
+                    setupColorTableView(unified, unifiedFlow, true);
                 } catch (AWTException ex) {
                     Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -302,7 +302,7 @@ public class BitBit extends Application {
             public void handle(MouseEvent event) {
                    Bitmap selectedImage = listView.getSelectionModel().getSelectedItem();
                    setupImageView(selectedImage);
-                   setupColorTableView(selectedImage.getColorTable(), colorFlow);
+                   setupColorTableView(selectedImage.getColorTable(), colorFlow, false);
             }
         });
     }
@@ -421,7 +421,7 @@ public class BitBit extends Application {
                     unifiedFlow.getChildren().removeAll(unifiedFlow.getChildren());
                     unified = new ColorTableUnifier().unify(tables);
                     //TODO: change setupColorTableView to accept a color table
-                    setupColorTableView(unified, unifiedFlow);
+                    setupColorTableView(unified, unifiedFlow, true);
                 } catch (AWTException ex) {
                     Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -446,7 +446,7 @@ public class BitBit extends Application {
                         curBitmap = new Bitmap(fileName);
                         setupImageView(curBitmap);
                         setupListViews(curBitmap);
-                        setupColorTableView(curBitmap.getColorTable(), colorFlow);
+                        setupColorTableView(curBitmap.getColorTable(), colorFlow, false);
                     } catch (Exception ex) {
                         Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -494,7 +494,7 @@ public class BitBit extends Application {
                     try {
                         curBitmap = new Bitmap(curFile);
                         setupImageView(curBitmap);
-                        setupColorTableView(curBitmap.getColorTable(), colorFlow);
+                        setupColorTableView(curBitmap.getColorTable(), colorFlow, false);
                         setupListViews(curBitmap);
                     } catch (Exception ex) {
                         Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
@@ -516,11 +516,12 @@ public class BitBit extends Application {
         if (i > 1) {
             System.out.println("Swapping " + swapSpots.get(i-2)
                     + " and "     + swapSpots.get(i-1));
-            
+            System.out.println("UNIFIED= \n"+ unified);
             ct.swapColors(swapSpots.get(i-2)
                     , swapSpots.get(i-1));            
             //refresh colorTableView to show change
-            setupColorTableView(ct, flow);
+            setupColorTableView(ct, flow, false);
+            System.out.println("UNIFIED AFTER= \n"+ unified);
         }
         else {
             System.err.println("ERROR: Select 2 colors to swap");
@@ -530,6 +531,7 @@ public class BitBit extends Application {
     public void saveBMP(String fileName) {
         try {
             try {
+                System.out.println("UNIFIED sbmp= \n"+ unified);
                 im.replaceColorTable(unified);
             } catch (AWTException ex) {
                 Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
