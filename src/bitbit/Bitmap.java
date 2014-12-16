@@ -1,40 +1,33 @@
 package bitbit;
 
 import java.io.*;
-import java.net.*;
 import java.awt.*;
-import java.awt.image.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
- * @author Jonny
+ * @author Mark
  * @author David
  */
 public class Bitmap implements Cloneable {
-    String bfName;
-    boolean windowsStyle;
-    ColorTable colorTable = new ColorTable();
-    int pix[];
-
-    byte bfType[];
-    int bfSize;
-    int bfOffset;
-    int biSize;
-    int biWidth;
-    int biHeight;
-    int biPlanes;
-    int biBitCount;
-    int biCompression;
-    int biSizeImage;
-    int biXPelsPerMeter;
-    int biYPelsPerMeter;
-    int biClrUsed;
-    int biClrImportant;
+    private String bfName;
+    private boolean windowsStyle;
+    private ColorTable colorTable = new ColorTable();
+    private int pix[];
+    
+    private byte bfType[];
+    private int bfSize;
+    private int bfOffset;
+    private int biSize;
+    private int biWidth;
+    private int biHeight;
+    private int biPlanes;
+    private int biBitCount;
+    private int biCompression;
+    private int biSizeImage;
+    private int biXPelsPerMeter;
+    private int biYPelsPerMeter;
+    private int biClrUsed;
+    private int biClrImportant;
 
     
     /**
@@ -53,6 +46,7 @@ public class Bitmap implements Cloneable {
             extractFileHeader(is);
             extractBitmapHeader(is);
             extractImageData(is);
+            is.close();
         }
         catch (IOException ioe )
         {
@@ -137,7 +131,7 @@ public class Bitmap implements Cloneable {
                 if ( windowsStyle )
                     is.skipBytes(1);
      
-                colorTable.addColor(new BmpColor(reds[x], greens[x], blues[x]));
+                colorTable.add(new BmpColor(reds[x], greens[x], blues[x]));
             }
         }
     }
@@ -426,16 +420,12 @@ public class Bitmap implements Cloneable {
         boolean[] changedPixels = new boolean[pix.length];
         for (BmpColor color : colorTable) {
             int indexInNewTable = newTable.getIndex(color);
-            System.out.println("newTable    getIndex " + newTable.getIndex(color) + " for " + color.toString());
-            System.out.println("colorTable  getIndex " + colorTable.getIndex(color)  + " for " + color.toString());
             int indexInThisTable = colorTable.getIndex(color);
             if (indexInNewTable != -1) {
                 if (indexInThisTable != indexInNewTable) {
                     for (int i = 0; i < pix.length; i++) {
                         if (!changedPixels[i] && pix[i] == indexInThisTable) {
                             pix[i] = indexInNewTable;
-//                            System.out.println("Swapping pixel " + i + "(" + changedPixels[i] + "): " + 
-//                                    indexInThisTable + " to " + indexInNewTable);
                             changedPixels[i] = true;
                         }
                     }
@@ -519,42 +509,34 @@ public String debug() {
         return bm;
     }
     
+    public String getBfName() {
+        return bfName;
+    }
+    
+    public int getBiWidth() {
+        return biWidth;
+    }
+    
+    public int getBiHeight() {
+        return biHeight;
+    }
+    
+    public int[] getPix() {
+        return pix;
+    }
+    
     public static void main( String args[] )
     {
         try
         {
-            String fileInput;
-            if (args.length < 1) {
-               fileInput = "C:/Users/David/Desktop/test.bmp";
-            }
-            else {
-                 fileInput = args[0];
-            }
             
-            Bitmap im = new Bitmap(fileInput);
-            System.out.println("Before swap:\n" + im);
+            Bitmap im = new Bitmap("/home/adam/Downloads/new1.bmp");
+            System.out.println(im.debug());
             System.out.println();
-            
-            System.out.println("Swapping colors");
-            ColorTable clrTable = new ColorTable();
-            for (BmpColor clr : im.getColorTable()) {
-                clrTable.addColor(clr);
-            }
-            clrTable.swapColors(0, 1);
-            clrTable.addColor(new BmpColor(0,0,0));
-            im.replaceColorTable(clrTable);
-            
-            System.out.println("After swap:\n" + im);
-            System.out.println();
-            
-            System.out.println("Writing to a file...");
-            im.exportBitmap("C:/Users/David/Desktop/test2.bmp");
-            System.out.println("Success");
         }
         catch ( Exception e )
         {
             System.out.println(e);
         }
     }
-    
 }

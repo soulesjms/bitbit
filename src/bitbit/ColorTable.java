@@ -9,8 +9,6 @@ import java.awt.AWTException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -40,6 +38,10 @@ public class ColorTable implements Iterable<BmpColor>, Cloneable {
         if (isNewColor) {
             colors.add(color);
         }
+    }
+    
+    public void add(BmpColor clr) {
+        colors.add(clr);
     }
     
     public BmpColor getColor(int index) {
@@ -76,8 +78,9 @@ public class ColorTable implements Iterable<BmpColor>, Cloneable {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder("");
+        int i = 0;
         for (BmpColor color : colors) {
-            buf.append(color.toString());
+            buf.append(i++ + " " + color.toString());
             buf.append("\n");
         }
         
@@ -111,15 +114,7 @@ public class ColorTable implements Iterable<BmpColor>, Cloneable {
         } catch (AWTException e) {
             e.printStackTrace();
         }
-        
-        System.out.println("ColorTable:");
-        System.out.println(ct);
-        
         ct.swapColors(0, 1);
-        
-        System.out.println("ColorTable Swapped:");
-        System.out.println(ct);
-        
     }
     
 }
