@@ -52,7 +52,15 @@ public class ColorTable implements Iterable<BmpColor>, Cloneable {
      * @return index of the given color, or -1 if not found.
      */
     public int getIndex(BmpColor color) {
-        return colors.indexOf(color);
+        int i = 0;
+        for (BmpColor c: colors) {
+            if (c.equals(color)) {
+                return i;
+            }
+            i++;
+        }
+        //this was the only line here:
+        return -1;
     }
     
     public int getNumColors() {

@@ -386,13 +386,14 @@ public class BitBit extends Application {
                     saveBMP(im, fileName);
             }
         });
-        //TODO: get working again, just do what swapBtn does
-        /*        swapMenu.setOnAction(new EventHandler<ActionEvent>() {
+        
+        //do what swapBtn does
+        swapMenu.setOnAction(new EventHandler<ActionEvent>() {
         @Override
         public void handle(ActionEvent event) {
-        swap();
+            swap(unified, unifiedFlow);
         }
-        });*/
+        });
 
         clearAll.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -499,7 +500,7 @@ public class BitBit extends Application {
                     new FileChooser.ExtensionFilter("All Files", "*.*"));
                 File file = chooser.showOpenDialog(primaryStage);
                 String fileName = file.getPath();
-                if (fileName.toLowerCase().contains(".bmp")) {
+                if (fileName.toLowerCase().endsWith(".bmp")) {
                     System.out.println(fileName);
                     Bitmap curBitmap;
                     try {
@@ -603,4 +604,22 @@ public class BitBit extends Application {
         }
     }
     
+    /**
+     * If an Image is large, have the Image library display it
+     * @param url 
+     */
+      public void OLDsetupImageView(String url) {
+        //TODO: check image width while loading and if it is too big, call
+        //this method
+        
+        //                                                  preserve ratio, smooth
+        //Image images = new Image(url, sceneWidth/2, sceneWidth/2/2, true, false);
+        //Image images = new Image("file:/home/adam/Desktop/P3183616.JPG");
+        Image image = new Image(url);
+        System.out.println("SetupImageView: " + url);
+        imgView.setImage(image);
+        imgView.setFitWidth(400);
+        imgView.setPreserveRatio(true);
+        imgView.setSmooth(false);
+    }
 }

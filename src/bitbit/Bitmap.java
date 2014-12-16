@@ -426,6 +426,8 @@ public class Bitmap implements Cloneable {
         boolean[] changedPixels = new boolean[pix.length];
         for (BmpColor color : colorTable) {
             int indexInNewTable = newTable.getIndex(color);
+            System.out.println("newTable    getIndex " + newTable.getIndex(color) + " for " + color.toString());
+            System.out.println("colorTable  getIndex " + colorTable.getIndex(color)  + " for " + color.toString());
             int indexInThisTable = colorTable.getIndex(color);
             if (indexInNewTable != -1) {
                 if (indexInThisTable != indexInNewTable) {
@@ -554,6 +556,5 @@ public String debug() {
             System.out.println(e);
         }
     }
-
     
 }
