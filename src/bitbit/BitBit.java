@@ -173,6 +173,7 @@ public class BitBit extends Application {
         //TODO: find speedier alternative, this is slower than anything
     public void setupImageView(Bitmap bitmap) {
         System.out.println("Setting imageView for: " + bitmap.bfName);
+        
         try {
             imgViewBlocks.getChildren().removeAll(imgViewBlocks.getChildren());
 
@@ -184,10 +185,12 @@ public class BitBit extends Application {
             //displayWidth
             int dWidth = bitmap.biWidth;
             int wrapLength = 400;
+            //enlarge view of image if space is left over
             while (dWidth < (wrapLength-bitmap.biWidth)) {
                 dWidth += bitmap.biWidth;
             }
             imgViewBlocks.setPrefWrapLength(dWidth+gap*(bitmap.biWidth+1));
+            imgViewBlocks.setMinWidth(dWidth+gap*(bitmap.biWidth+1));
             //track spot in loop
             int i = 0;
             for (int perPix : bitmap.pix) {
@@ -445,7 +448,7 @@ public class BitBit extends Application {
                 File file = fileChooser1.showSaveDialog(primaryStage);
                 if (file != null) {
                     String fileName = file.getPath();
-                    if (fileName.toLowerCase().contains(".bmp")) {
+                    if (fileName.toLowerCase().endsWith(".bmp")) {
                         System.out.println("Save file to here");
                         saveBMP(fileName);
                     } 
@@ -469,8 +472,8 @@ public class BitBit extends Application {
                 try {
                     unifiedFlow.getChildren().removeAll(unifiedFlow.getChildren());
                     unified = new ColorTableUnifier().unify(tables);
-                    //TODO: change setupColorTableView to accept a color table
                     setupColorTableView(unified, unifiedFlow, true);
+                    //TODO: actually write out each image
                 } catch (AWTException ex) {
                     Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -496,6 +499,8 @@ public class BitBit extends Application {
                         setupImageView(curBitmap);
                         setupListViews(curBitmap);
                         setupColorTableView(curBitmap.getColorTable(), colorFlow, false);
+                       //TODO: set focussed cell to last item in listview
+//                        listView.setFocusModel(curBitmap);
                     } catch (Exception ex) {
                         Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
                     }

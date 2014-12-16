@@ -450,10 +450,16 @@ public class Bitmap {
             colorTable = newTable;
     }
     
+    /**
+     * Simple filename(everything after the last slash)
+     * @return 
+     */
     @Override
     public String toString() {
-        return bfName;
+        String[] split = bfName.split("/");
+        return split[split.length-1];
     }
+    
     /**
      * Describe the image as a string
      * @return string representation of image
