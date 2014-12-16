@@ -7,13 +7,15 @@ import java.awt.image.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Jonny
  * @author David
  */
-public class Bitmap {
+public class Bitmap implements Cloneable {
     String bfName;
     boolean windowsStyle;
     ColorTable colorTable = new ColorTable();
@@ -312,6 +314,7 @@ public class Bitmap {
         writeBitmapHeader(out);
         writeColorTable(out);
         writeImageData(out);
+        out.close();
     }
 
     /**
@@ -504,6 +507,14 @@ public String debug() {
         
         return buf.toString();
         
+    }
+
+    @Override
+    public Bitmap clone() throws CloneNotSupportedException {
+        Bitmap bm;
+        bm = (Bitmap) super.clone();
+        bm.colorTable = (ColorTable) colorTable.clone();
+        return bm;
     }
     
     public static void main( String args[] )

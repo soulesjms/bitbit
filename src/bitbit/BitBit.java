@@ -54,8 +54,8 @@ public class BitBit extends Application {
     List<ColorTable> tables = new ArrayList<>();
     
     static Bitmap im;
-    static String defaultFileIn = "/home/adam/Desktop/4pixle.bmp";
-    static String defaultFileIn2 = "/home/adam/Desktop/n.bmp";
+    static String defaultFileIn = "C:/Users/David/Desktop/test.bmp";
+    static String defaultFileIn2 = "C:/Users/David/Desktop/test2.bmp";
     static String curFile = defaultFileIn;
     //final Image images = new Image(defaultFileIn);
     ImageView imgView = new ImageView();
@@ -383,7 +383,7 @@ public class BitBit extends Application {
             public void handle(ActionEvent event) {
                     String fileName = "/home/adam/Desktop/exported.bmp";
                     System.out.println("Saving to " + fileName);
-                    saveBMP(fileName);
+                    saveBMP(im, fileName);
             }
         });
         //TODO: get working again, just do what swapBtn does
@@ -458,11 +458,11 @@ public class BitBit extends Application {
                     String fileName = file.getPath();
                     if (fileName.toLowerCase().endsWith(".bmp")) {
                         System.out.println("Save file to here");
-                        saveBMP(fileName);
+                        saveBMP(im, fileName);
                     } 
                     else {
                         System.out.println("Not good to save to that type of file, adding .bmp");
-                        saveBMP(fileName+".bmp");
+                        saveBMP(im, fileName+".bmp");
                     }
                 } else {
                     System.out.println("ERROR: save path is empty");
@@ -588,15 +588,17 @@ public class BitBit extends Application {
         }
     }
     
-    public void saveBMP(String fileName) {
+    public void saveBMP(Bitmap bitmap, String fileName) {
+        
         try {
-            try {
-                im.replaceColorTable(unified);
-            } catch (AWTException ex) {
-                Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            im.exportBitmap(fileName);
+            Bitmap toExport = bitmap.clone();
+            toExport.replaceColorTable(unified);
+            toExport.exportBitmap(fileName);
         } catch (IOException ex) {
+            Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (AWTException ex) {
+            Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CloneNotSupportedException ex) {
             Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

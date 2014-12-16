@@ -9,12 +9,14 @@ import java.awt.AWTException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author David
  */
-public class ColorTable implements Iterable<BmpColor> {
+public class ColorTable implements Iterable<BmpColor>, Cloneable {
     
     private List<BmpColor> colors = new ArrayList<>();
     
@@ -77,6 +79,17 @@ public class ColorTable implements Iterable<BmpColor> {
     @Override
     public Iterator<BmpColor> iterator() {
         return colors.iterator();
+    }
+    
+    @Override
+    public ColorTable clone() throws CloneNotSupportedException {
+        ColorTable ct;
+        ct = (ColorTable) super.clone();
+        ct.colors = new ArrayList<>();
+        for (BmpColor clr : colors) {
+            ct.colors.add(clr.clone());
+        }
+        return ct;
     }
     
     public static void main(String[] args) {

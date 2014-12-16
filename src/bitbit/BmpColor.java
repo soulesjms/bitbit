@@ -9,7 +9,7 @@ package bitbit;
  *
  * @author David
  */
-public class BmpColor {
+public class BmpColor implements Cloneable {
     
     private int red;
     private int green;
@@ -53,5 +53,10 @@ public class BmpColor {
     public boolean equals(BmpColor clr) {
         return this.getRed() == clr.getRed() && this.getGreen() == clr.getGreen()
                 && this.getBlue() == clr.getBlue();
+    }
+    
+    @Override
+    public BmpColor clone() throws CloneNotSupportedException {
+        return (BmpColor) super.clone();
     }
 }
