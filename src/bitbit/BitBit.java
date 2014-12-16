@@ -383,16 +383,17 @@ public class BitBit extends Application {
             public void handle(ActionEvent event) {
                     String fileName = "/home/adam/Desktop/exported.bmp";
                     System.out.println("Saving to " + fileName);
-                    saveBMP(fileName);
+                    saveBMP(im.bfName, fileName);
             }
         });
-        //TODO: get working again, just do what swapBtn does
-        /*        swapMenu.setOnAction(new EventHandler<ActionEvent>() {
+        
+        //do what swapBtn does
+        swapMenu.setOnAction(new EventHandler<ActionEvent>() {
         @Override
         public void handle(ActionEvent event) {
-        swap();
+            swap(unified, unifiedFlow);
         }
-        });*/
+        });
 
         clearAll.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -458,11 +459,11 @@ public class BitBit extends Application {
                     String fileName = file.getPath();
                     if (fileName.toLowerCase().endsWith(".bmp")) {
                         System.out.println("Save file to here");
-                        saveBMP(fileName);
+                        saveBMP(im.bfName, fileName);
                     } 
                     else {
                         System.out.println("Not good to save to that type of file, adding .bmp");
-                        saveBMP(fileName+".bmp");
+                        saveBMP(im.bfName, fileName+".bmp");
                     }
                 } else {
                     System.out.println("ERROR: save path is empty");
@@ -499,7 +500,7 @@ public class BitBit extends Application {
                     new FileChooser.ExtensionFilter("All Files", "*.*"));
                 File file = chooser.showOpenDialog(primaryStage);
                 String fileName = file.getPath();
-                if (fileName.toLowerCase().contains(".bmp")) {
+                if (fileName.toLowerCase().endsWith(".bmp")) {
                     System.out.println(fileName);
                     Bitmap curBitmap;
                     try {
@@ -588,17 +589,41 @@ public class BitBit extends Application {
         }
     }
     
-    public void saveBMP(String fileName) {
+    public void saveBMP(String inFileName, String outFileName) {
+        System.out.println("SAVING " + inFileName + " TO " + outFileName);
         try {
+            Bitmap curBitmap = new Bitmap(inFileName);
             try {
-                im.replaceColorTable(unified);
-            } catch (AWTException ex) {
+                try {
+                    curBitmap.replaceColorTable(unified);
+                } catch (AWTException ex) {
+                    Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                curBitmap.exportBitmap(outFileName);
+            } catch (IOException ex) {
                 Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
             }
-            im.exportBitmap(fileName);
-        } catch (IOException ex) {
+        } catch (AWTException ex) {
             Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }   
     }
     
+    /**
+     * If an Image is large, have the Image library display it
+     * @param url 
+     */
+      public void OLDsetupImageView(String url) {
+        //TODO: check image width while loading and if it is too big, call
+        //this method
+        
+        //                                                  preserve ratio, smooth
+        //Image images = new Image(url, sceneWidth/2, sceneWidth/2/2, true, false);
+        //Image images = new Image("file:/home/adam/Desktop/P3183616.JPG");
+        Image image = new Image(url);
+        System.out.println("SetupImageView: " + url);
+        imgView.setImage(image);
+        imgView.setFitWidth(400);
+        imgView.setPreserveRatio(true);
+        imgView.setSmooth(false);
+    }
 }
