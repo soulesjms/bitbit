@@ -474,17 +474,11 @@ public class BitBit extends Application {
         saveAll.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                List<ColorTable> tables = new ArrayList<>();
-                for (Bitmap bmpUrl : thumbsList){
-                    tables.add(bmpUrl.getColorTable());
-                }
-                try {
-                    unifiedFlow.getChildren().removeAll(unifiedFlow.getChildren());
-                    unified = new ColorTableUnifier().unify(tables);
-                    setupColorTableView(unified, unifiedFlow, true);
-                    //TODO: actually write out each image
-                } catch (AWTException ex) {
-                    Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
+                DirectoryChooser chooser = new DirectoryChooser();
+                File selectedDirectory = chooser.showDialog(primaryStage);
+                int i = 0;
+                for(Bitmap url : thumbsList) {
+                    saveBMP(url, selectedDirectory.getPath() + "\\" + i++ + ".bmp");
                 }
             }
         });
@@ -524,6 +518,9 @@ public class BitBit extends Application {
                 DirectoryChooser chooser = new DirectoryChooser();
                 chooser.setTitle("Choose BMP Folder");
                 File selectedDirectory = chooser.showDialog(primaryStage);
+                if (selectedDirectory == null) {
+                    return;
+                }
                 System.out.println("filepath:");
                 System.out.println(selectedDirectory);
                 try {
