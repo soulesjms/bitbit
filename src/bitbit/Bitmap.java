@@ -456,8 +456,16 @@ public class Bitmap {
      */
     @Override
     public String toString() {
-        String[] split = bfName.split("/");
-        return split[split.length-1];
+        String[] split;
+        if (bfName.contains("\\")) {
+            split = bfName.split("\\+");
+            return split[split.length-1];            
+        }
+        else if (bfName.contains("/")) {
+            split = bfName.split("/");
+            return split[split.length-1];
+        }
+        return bfName;
     }
     
     /**
