@@ -92,8 +92,9 @@ public class BitBit extends Application {
     FlowPane imgViewBlocks = new FlowPane();
     FlowPane colorFlow = new FlowPane();
     FlowPane unifiedFlow = new FlowPane();
+    FlowPane swapColorsFlow = new FlowPane();
 //Scene
-    int sceneWidth = 800;
+    int sceneWidth = 780;
     int sceneHeight = 450;
     
     public static void main(String[] args){
@@ -136,14 +137,21 @@ public class BitBit extends Application {
              ScrollPane unifiedSPane = new ScrollPane();
              unifiedSPane.setContent(setupColorTableView(unified, unifiedFlow, true));
              
+             //Swap view of last 2 selected colors
+             ScrollPane swapColorsSPane = new ScrollPane();
+             setupSwapColorsFlow(swapSpots);
+             swapColorsSPane.setContent(swapColorsFlow);
+             swapColorsFlow.setMaxWidth(34);
+
              //col, row, coltakeup, rowtakeup
-             grid.add(mainMenu,      0, 0, 7, 1); //menu Bar
-             grid.add(listView,      0, 1, 1, 2); //list of files
-             grid.add(imgViewBlocks, 1, 1, 1, 2); //image display
-             grid.add(swapBtn,       2, 0, 1, 1); //swap button
+             grid.add(mainMenu,        0, 0, 7, 1); //menu Bar
+             grid.add(listView,        0, 1, 1, 2); //list of files
+             grid.add(imgViewBlocks,   1, 1, 1, 2); //image display
+             grid.add(swapColorsFlow,  4, 0, 1, 1); //image display
+             grid.add(swapBtn,         3, 0, 1, 1); //swap button
              //        grid.add(swapLbl,       2, 1, 1, 1);
-             grid.add(colorFlow,     2, 1, 2, 1); //color table display
-             grid.add(generateColorTable, 3, 0, 1, 1);
+             grid.add(colorFlow,       2, 1, 2, 1); //color table display
+             grid.add(generateColorTable, 2, 0, 1, 1);
              grid.add(colorSPane,         2, 1, 2, 1); //color table display
              grid.add(unifiedSPane,       2, 2, 2, 1); //color table display
              
@@ -179,7 +187,6 @@ public class BitBit extends Application {
             while (dWidth < (wrapLength-bitmap.biWidth)) {
                 dWidth += bitmap.biWidth;
             }
-            System.out.println("Display Width " + dWidth);
             imgViewBlocks.setPrefWrapLength(dWidth+gap*(bitmap.biWidth+1));
             //track spot in loop
             int i = 0;
@@ -204,15 +211,16 @@ public class BitBit extends Application {
                                 colorString = r.toString().split("fill=0x")[1];
                             }
                             String selectedItem = colorString.substring(0, 6);
-                            System.out.println("Selecting [" + perPix + "] "
-                                    + selectedItem + " [" + iTemp + "] in pixel array");
+                            System.out.println("Clicked [" + perPix + "] "
+                                    + selectedItem + " [" + iTemp + "] in pixel array"
+                                    + ", No action will be taken");
                         }
                     });
                     // Configure rectangle and add to the imgViewBlocks
                     imgViewBlocks.getChildren().add(r);
                     i++;
                 } catch (IllegalArgumentException e) {
-                }
+                }//        swapColorsFlow.setPrefWrapLength(50);
             }
         } catch (Exception e) {
             System.err.println("Setup Image View Error\nImage: " + bitmap.bfName);
@@ -232,7 +240,7 @@ public class BitBit extends Application {
             int gap = 2;
             flow.setVgap(gap);
             flow.setHgap(gap);
-            flow.setPrefWrapLength(400-imgViewBlocks.getPrefWrapLength()+150);
+            flow.setPrefWrapLength(400-imgViewBlocks.getPrefWrapLength()+200);
                                          
             for (int count = 0; count < ct.getNumColors(); count++) {
                 try {
@@ -252,6 +260,7 @@ public class BitBit extends Application {
                                 String selectedItem = r.toString().substring(56, 62);
                                 System.out.println("Selecting [" + iTemp + "] " + selectedItem);
                                 swapSpots.add(iTemp);
+                                setupSwapColorsFlow(swapSpots);
                             }
                         });
                     }
@@ -305,6 +314,46 @@ public class BitBit extends Application {
                    setupColorTableView(selectedImage.getColorTable(), colorFlow, false);
             }
         });
+    }
+    
+    public void setupSwapColorsFlow(List<Integer> swapSpots) {
+        swapColorsFlow.getChildren().removeAll(swapColorsFlow.getChildren());
+        int gap = 2;
+        swapColorsFlow.setVgap(gap);
+        swapColorsFlow.setHgap(gap);
+        swapColorsFlow.setPrefWrapLength(34);
+        System.out.println("swapSpots.size()=" + swapSpots.size());
+        if (swapSpots.size() > 0) {
+            int count = swapSpots.size();
+            if (swapSpots.size() > 1) {
+                count = swapSpots.size() - 1;                
+            }
+            for (; count <= swapSpots.size(); count++) {
+                System.out.println("count=" + count);
+                try {
+                    Color co;
+                    co = Color.rgb(unified.getColor(swapSpots.get(count-1)).getRed(),
+                            unified.getColor(swapSpots.get(count-1)).getGreen(),
+                            unified.getColor(swapSpots.get(count-1)).getBlue());
+                    
+                    final Rectangle r = new Rectangle(15, 15, co);
+                    final int iTemp = count;
+                    r.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                        
+                        @Override
+                        public void handle(MouseEvent event) {
+                            //TODO: grab selected item only
+                            String selectedItem = r.toString().substring(56, 62);
+                            System.out.println("Displaying [" + iTemp + "] " + selectedItem);
+                        }
+                    });                    
+                    // add rectangle to swapColorsFlow container
+                    swapColorsFlow.getChildren().add(r);
+                } catch (IllegalArgumentException e) {
+                    System.err.println("Color making failed");
+                }
+            }
+            }
     }
     
     public void setupMenus(final Stage primaryStage) {
@@ -516,12 +565,12 @@ public class BitBit extends Application {
         if (i > 1) {
             System.out.println("Swapping " + swapSpots.get(i-2)
                     + " and "     + swapSpots.get(i-1));
-            System.out.println("UNIFIED= \n"+ unified);
             ct.swapColors(swapSpots.get(i-2)
                     , swapSpots.get(i-1));            
             //refresh colorTableView to show change
-            setupColorTableView(ct, flow, false);
-            System.out.println("UNIFIED AFTER= \n"+ unified);
+            setupColorTableView(ct, flow, true);
+            swapSpots.clear();
+            swapColorsFlow.getChildren().removeAll(swapColorsFlow.getChildren());
         }
         else {
             System.err.println("ERROR: Select 2 colors to swap");
@@ -531,7 +580,6 @@ public class BitBit extends Application {
     public void saveBMP(String fileName) {
         try {
             try {
-                System.out.println("UNIFIED sbmp= \n"+ unified);
                 im.replaceColorTable(unified);
             } catch (AWTException ex) {
                 Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
