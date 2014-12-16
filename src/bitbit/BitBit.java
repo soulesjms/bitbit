@@ -27,6 +27,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
@@ -308,8 +309,8 @@ public class BitBit extends Application {
         listView.setItems(thumbsList);
         listView.setPrefWidth(150);
         listView.setPrefHeight(sceneHeight - 30);
+        
         listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
             @Override
             public void handle(MouseEvent event) {
                    Bitmap selectedImage = listView.getSelectionModel().getSelectedItem();
@@ -317,6 +318,14 @@ public class BitBit extends Application {
                    setupColorTableView(selectedImage.getColorTable(), colorFlow, false);
             }
         });
+        listView.setOnMouseEntered(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                listView.setTooltip(new Tooltip(listView.getSelectionModel().getSelectedItem().bfName+ " is selected"));
+            }
+        });
+        //set focussed cell to last item in listview
+        listView.getSelectionModel().select(thumbsList.size()-1);
     }
     
     public void setupSwapColorsFlow(List<Integer> swapSpots) {
@@ -325,14 +334,12 @@ public class BitBit extends Application {
         swapColorsFlow.setVgap(gap);
         swapColorsFlow.setHgap(gap);
         swapColorsFlow.setPrefWrapLength(34);
-        System.out.println("swapSpots.size()=" + swapSpots.size());
         if (swapSpots.size() > 0) {
             int count = swapSpots.size();
             if (swapSpots.size() > 1) {
                 count = swapSpots.size() - 1;                
             }
             for (; count <= swapSpots.size(); count++) {
-                System.out.println("count=" + count);
                 try {
                     Color co;
                     co = Color.rgb(unified.getColor(swapSpots.get(count-1)).getRed(),
@@ -499,8 +506,6 @@ public class BitBit extends Application {
                         setupImageView(curBitmap);
                         setupListViews(curBitmap);
                         setupColorTableView(curBitmap.getColorTable(), colorFlow, false);
-                       //TODO: set focussed cell to last item in listview
-//                        listView.setFocusModel(curBitmap);
                     } catch (Exception ex) {
                         Logger.getLogger(BitBit.class.getName()).log(Level.SEVERE, null, ex);
                     }
